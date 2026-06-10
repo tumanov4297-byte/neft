@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Симулятор Завхоза ГБУ ЯНАО ЦСОН "Гармония"</title>
+    <title>Симулятор Завхоза — ГБУ ЯНАО ЦСОН "Гармония"</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.19/cyrillic.css" rel="stylesheet">
     <style>
@@ -22,28 +22,16 @@
             position: relative;
             overflow: hidden;
         }
-        .btn-action:hover {
+        .btn-action:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.3);
         }
-        .btn-action:active {
+        .btn-action:active:not(:disabled) {
             transform: translateY(0);
         }
-        .btn-action::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-        .btn-action:active::after {
-            width: 300px;
-            height: 300px;
+        .btn-action:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
         .particle {
             position: fixed;
@@ -81,33 +69,32 @@
             from { opacity: 0; transform: translateX(-20px); }
             to { opacity: 1; transform: translateX(0); }
         }
-        .cat-pet {
-            animation: catPet 0.5s ease-in-out;
+        .tab-active {
+            background: rgba(234, 179, 8, 0.2);
+            border-color: rgba(234, 179, 8, 0.5);
         }
-        @keyframes catPet {
-            0%, 100% { transform: rotate(0deg); }
-            50% { transform: rotate(5deg) scale(1.05); }
-        }
-        .event-modal {
+        .modal {
             animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         @keyframes modalPop {
             from { opacity: 0; transform: scale(0.8); }
             to { opacity: 1; transform: scale(1); }
         }
-        .upgrade-btn {
-            transition: all 0.3s ease;
-        }
-        .upgrade-btn:hover:not(:disabled) {
-            transform: scale(1.02);
-        }
-        .upgrade-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
         ::-webkit-scrollbar-thumb { background: rgba(234, 179, 8, 0.5); border-radius: 4px; }
+        .task-item {
+            transition: all 0.3s ease;
+        }
+        .task-item:hover {
+            background: rgba(255,255,255,0.05);
+        }
+        .staff-card {
+            transition: all 0.3s ease;
+        }
+        .staff-card:hover {
+            transform: scale(1.02);
+        }
     </style>
 </head>
 <body class="text-white overflow-x-hidden">
@@ -117,106 +104,164 @@
             <h1 class="text-3xl md:text-5xl font-bold bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 bg-clip-text text-transparent drop-shadow-lg">
                 Симулятор Завхоза
             </h1>
-            <p class="text-gray-400 mt-2 text-sm md:text-base">ГБУ ЯНАО ЦСОН «Гармония» — день из жизни легендарного завхоза</p>
+            <p class="text-gray-400 mt-2 text-sm md:text-base">ГБУ ЯНАО ЦСОН «Гармония» — полный контроль хозяйства</p>
+            <div class="mt-3 flex justify-center gap-6 text-sm flex-wrap">
+                <span class="text-yellow-400">📅 День: <span id="game-day">1</span></span>
+                <span class="text-blue-400">💰 Бюджет: <span id="game-budget">50000</span>₽</span>
+                <span class="text-green-400"> Рейтинг: <span id="game-rating">50</span>%</span>
+            </div>
         </header>
 
-        <!-- Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
             <div class="glass rounded-xl p-4">
                 <div class="flex justify-between items-center mb-2">
-                    <span class="text-yellow-400 font-bold">🏆 Уровень херни</span>
-                    <span id="stat-authority" class="text-2xl font-bold text-yellow-400">0</span>
+                    <span class="text-yellow-400 font-bold text-sm">🏆 Авторитет</span>
+                    <span id="stat-authority" class="text-xl font-bold text-yellow-400">100</span>
                 </div>
                 <div class="w-full bg-gray-700 rounded-full h-2">
-                    <div id="bar-authority" class="bg-gradient-to-r from-yellow-400 to-orange-500 h-2 rounded-full progress-fill" style="width: 0%"></div>
+                    <div id="bar-authority" class="bg-gradient-to-r from-yellow-400 to-orange-500 h-2 rounded-full progress-fill" style="width: 10%"></div>
                 </div>
-                <p class="text-xs text-gray-400 mt-1">Цель: 1000</p>
             </div>
             <div class="glass rounded-xl p-4">
                 <div class="flex justify-between items-center mb-2">
-                    <span class="text-blue-400 font-bold">🍵 Чай с беляшом</span>
-                    <span id="stat-tea" class="text-2xl font-bold text-blue-400">10</span>
+                    <span class="text-blue-400 font-bold text-sm">🍵 Чай/Кофе</span>
+                    <span id="stat-tea" class="text-xl font-bold text-blue-400">50</span>
                 </div>
                 <div class="w-full bg-gray-700 rounded-full h-2">
-                    <div id="bar-tea" class="bg-gradient-to-r from-blue-400 to-cyan-500 h-2 rounded-full progress-fill" style="width: 10%"></div>
+                    <div id="bar-tea" class="bg-gradient-to-r from-blue-400 to-cyan-500 h-2 rounded-full progress-fill" style="width: 50%"></div>
                 </div>
-                <p class="text-xs text-gray-400 mt-1">Топливо для херни</p>
             </div>
             <div class="glass rounded-xl p-4">
                 <div class="flex justify-between items-center mb-2">
-                    <span class="text-red-400 font-bold">️ Штрафы от Донского</span>
-                    <span id="stat-fines" class="text-2xl font-bold text-red-400">0</span>
+                    <span class="text-red-400 font-bold text-sm">⚠️ Штрафы</span>
+                    <span id="stat-fines" class="text-xl font-bold text-red-400">0</span>
                 </div>
                 <div class="w-full bg-gray-700 rounded-full h-2">
                     <div id="bar-fines" class="bg-gradient-to-r from-red-400 to-pink-500 h-2 rounded-full progress-fill" style="width: 0%"></div>
                 </div>
-                <p class="text-xs text-gray-400 mt-1">Опасно: 100</p>
+            </div>
+            <div class="glass rounded-xl p-4">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-purple-400 font-bold text-sm">⚡ Энергия</span>
+                    <span id="stat-energy" class="text-xl font-bold text-purple-400">100</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-2">
+                    <div id="bar-energy" class="bg-gradient-to-r from-purple-400 to-pink-500 h-2 rounded-full progress-fill" style="width: 100%"></div>
+                </div>
             </div>
         </div>
 
-        <!-- Main Content -->
+        <!-- Tabs -->
+        <div class="flex flex-wrap gap-2 mb-6">
+            <button onclick="switchTab('tasks')" id="tab-tasks" class="btn-action glass rounded-lg px-4 py-2 text-sm tab-active">📋 Задачи</button>
+            <button onclick="switchTab('shop')" id="tab-shop" class="btn-action glass rounded-lg px-4 py-2 text-sm"> Закупки</button>
+            <button onclick="switchTab('staff')" id="tab-staff" class="btn-action glass rounded-lg px-4 py-2 text-sm">👥 Персонал</button>
+            <button onclick="switchTab('inventory')" id="tab-inventory" class="btn-action glass rounded-lg px-4 py-2 text-sm">📦 Склад</button>
+            <button onclick="switchTab('repairs')" id="tab-repairs" class="btn-action glass rounded-lg px-4 py-2 text-sm"> Ремонты</button>
+        </div>
+
+        <!-- Tab Content -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Character & Actions -->
-            <div class="lg:col-span-2 space-y-6">
-                <!-- Character Image -->
-                <div class="glass rounded-2xl p-6 text-center pulse-glow">
-                    <img src="https://vk.com/alishka990789?z=photo410604825_457247684%2F8859494a1e2db801b3" 
-                         alt="Завхоз ГБУ ЯНАО ЦСОН Гармония" 
-                         class="w-full max-w-md mx-auto rounded-xl shadow-2xl mb-4"
-                         id="character-img">
-                    <h2 class="text-2xl font-bold text-yellow-400">Алиев Алладин Балдадашевич</h2>
-                    <p class="text-gray-300 text-sm mt-2">Завхоз ГБУ ЯНАО ЦСОН «Гармония»</p>
-                    <p class="text-gray-400 text-xs mt-1 italic">"Пока директор в отпуске — я тут главный. А кот Барсик — мой зам."</p>
-                    <div class="mt-3 flex justify-center gap-4 text-sm flex-wrap">
-                        <span class="text-green-400">⚡ Энергия: <span id="energy-val">100</span>%</span>
-                        <span class="text-purple-400">🐱 Настроение Барсика: <span id="cat-mood">100</span>%</span>
+            <!-- Main Panel -->
+            <div class="lg:col-span-2">
+                <!-- Tasks Tab -->
+                <div id="content-tasks" class="tab-content">
+                    <div class="glass rounded-2xl p-6 mb-6">
+                        <h3 class="text-xl font-bold text-yellow-400 mb-4">📋 Активные задачи</h3>
+                        <div id="tasks-list" class="space-y-3">
+                            <!-- Tasks injected by JS -->
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-green-400 mb-4">⚡ Быстрые действия</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <button onclick="actionPatrol(event)" class="btn-action glass rounded-xl p-4 text-left hover:bg-green-500/10">
+                                <div class="font-bold text-green-400"> Обход территории</div>
+                                <div class="text-xs text-gray-400 mt-1">Проверить состояние помещений</div>
+                            </button>
+                            <button onclick="actionTea(event)" class="btn-action glass rounded-xl p-4 text-left hover:bg-blue-500/10">
+                                <div class="font-bold text-blue-400">🍵 Пить чай</div>
+                                <div class="text-xs text-gray-400 mt-1">Восстановить энергию +10</div>
+                            </button>
+                            <button onclick="actionPaperwork(event)" class="btn-action glass rounded-xl p-4 text-left hover:bg-purple-500/10">
+                                <div class="font-bold text-purple-400">📄 Бумажная работа</div>
+                                <div class="text-xs text-gray-400 mt-1">Заполнить документы</div>
+                            </button>
+                            <button onclick="actionInspect(event)" class="btn-action glass rounded-xl p-4 text-left hover:bg-yellow-500/10">
+                                <div class="font-bold text-yellow-400">🔍 Инспекция</div>
+                                <div class="text-xs text-gray-400 mt-1">Проверить персонал</div>
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Actions -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <button id="btn-decree" onclick="actionDecree(event)" class="btn-action glass rounded-xl p-4 text-left hover:bg-yellow-500/10">
-                        <div class="text-3xl mb-2">🎴</div>
-                        <div class="font-bold text-yellow-400">Сделать херню</div>
-                        <div class="text-xs text-gray-400 mt-1">+Уровень херни, -Чай, -Энергия</div>
-                        <div class="text-xs text-gray-500 mt-1">Шанс поймать директора: 15%</div>
-                    </button>
-                    <button id="btn-tea" onclick="actionTea(event)" class="btn-action glass rounded-xl p-4 text-left hover:bg-blue-500/10">
-                        <div class="text-3xl mb-2">🍵</div>
-                        <div class="font-bold text-blue-400">Гонять чай</div>
-                        <div class="text-xs text-gray-400 mt-1">+Чай, +Энергия</div>
-                        <div class="text-xs text-gray-500 mt-1">Самое продуктивное место</div>
-                    </button>
-                    <button id="btn-cat" onclick="actionCat(event)" class="btn-action glass rounded-xl p-4 text-left hover:bg-purple-500/10">
-                        <div class="text-3xl mb-2">🐱</div>
-                        <div class="font-bold text-purple-400">Погладить кота Барсика</div>
-                        <div class="text-xs text-gray-400 mt-1">+Херня, -Штрафы</div>
-                        <div class="text-xs text-gray-500 mt-1">Барсик — моральная опора</div>
-                    </button>
+                <!-- Shop Tab -->
+                <div id="content-shop" class="tab-content hidden">
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-blue-400 mb-4">🛒 Закупки материалов</h3>
+                        <div id="shop-list" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <!-- Shop items injected by JS -->
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Upgrades -->
-                <div class="glass rounded-2xl p-6">
-                    <h3 class="text-xl font-bold text-yellow-400 mb-4">🏗️ Улучшения кабинета завхоза</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="upgrades-container">
-                        <!-- Upgrades injected by JS -->
+                <!-- Staff Tab -->
+                <div id="content-staff" class="tab-content hidden">
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-purple-400 mb-4">👥 Управление персоналом</h3>
+                        <div id="staff-list" class="space-y-3">
+                            <!-- Staff injected by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventory Tab -->
+                <div id="content-inventory" class="tab-content hidden">
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-orange-400 mb-4">📦 Склад материалов</h3>
+                        <div id="inventory-list" class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            <!-- Inventory injected by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Repairs Tab -->
+                <div id="content-repairs" class="tab-content hidden">
+                    <div class="glass rounded-2xl p-6">
+                        <h3 class="text-xl font-bold text-red-400 mb-4">🔧 Ремонтные работы</h3>
+                        <div id="repairs-list" class="space-y-3">
+                            <!-- Repairs injected by JS -->
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Sidebar: Log & Achievements -->
+            <!-- Sidebar -->
             <div class="space-y-6">
+                <!-- Character -->
+                <div class="glass rounded-2xl p-6 text-center pulse-glow">
+                    <img src="https://vk.com/alishka990789?z=photo410604825_457247684%2F8859494a1e2db801b3" 
+                         alt="Завхоз" 
+                         class="w-32 h-32 mx-auto rounded-full shadow-2xl mb-3 object-cover">
+                    <h2 class="text-lg font-bold text-yellow-400">Алиев А.Б.</h2>
+                    <p class="text-gray-400 text-xs">Завхоз ГБУ ЯНАО ЦСОН «Гармония»</p>
+                    <p class="text-gray-500 text-xs mt-2 italic">Директор: Донсков Г.В.</p>
+                </div>
+
                 <!-- Event Log -->
                 <div class="glass rounded-2xl p-6">
-                    <h3 class="text-xl font-bold text-green-400 mb-3">📋 Журнал событий</h3>
+                    <h3 class="text-xl font-bold text-green-400 mb-3">📋 Журнал</h3>
                     <div id="event-log" class="space-y-2 max-h-96 overflow-y-auto pr-2">
-                        <div class="log-entry text-sm text-gray-400 italic">Утро. Директор уехала. Барсик мурлычет на сервере...</div>
+                        <div class="log-entry text-sm text-gray-400 italic">Новый рабочий день начался...</div>
                     </div>
                 </div>
 
                 <!-- Achievements -->
                 <div class="glass rounded-2xl p-6">
-                    <h3 class="text-xl font-bold text-pink-400 mb-3">🎖️ Достижения завхоза</h3>
+                    <h3 class="text-xl font-bold text-pink-400 mb-3">🎖️ Достижения</h3>
                     <div id="achievements" class="space-y-2">
                         <!-- Injected by JS -->
                     </div>
@@ -226,182 +271,226 @@
 
         <!-- Footer -->
         <footer class="text-center mt-8 text-gray-500 text-xs">
-            <p>© 2026 ГБУ ЯНАО ЦСОН «Гармония». Все херни совершены с душой. Кот Барсик одобряет.</p>
+            <p>© 2026 ГБУ ЯНАО ЦСОН «Гармония». Директор: Донсков Григорий Владимирович</p>
         </footer>
     </div>
 
     <!-- Event Modal -->
     <div id="event-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden p-4">
-        <div class="event-modal glass rounded-2xl p-8 max-w-md w-full text-center">
+        <div class="modal glass rounded-2xl p-8 max-w-md w-full text-center">
             <div id="modal-icon" class="text-6xl mb-4">⚠️</div>
             <h3 id="modal-title" class="text-2xl font-bold text-yellow-400 mb-3">Событие!</h3>
             <p id="modal-text" class="text-gray-300 mb-6">Текст события</p>
-            <div id="modal-choices" class="space-y-3">
-                <!-- Choices injected by JS -->
-            </div>
+            <div id="modal-choices" class="space-y-3"></div>
         </div>
     </div>
 
-    <!-- Win/Lose Modal -->
-    <div id="end-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden p-4">
-        <div class="event-modal glass rounded-2xl p-8 max-w-lg w-full text-center">
-            <div id="end-icon" class="text-7xl mb-4">🏆</div>
-            <h3 id="end-title" class="text-3xl font-bold text-yellow-400 mb-3">Победа!</h3>
-            <p id="end-text" class="text-gray-300 mb-6">Текст</p>
-            <button onclick="location.reload()" class="btn-action bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold py-3 px-8 rounded-xl">
-                Начать заново
-            </button>
+    <!-- Task Modal -->
+    <div id="task-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden p-4">
+        <div class="modal glass rounded-2xl p-8 max-w-md w-full">
+            <h3 id="task-modal-title" class="text-xl font-bold text-yellow-400 mb-3">Задача</h3>
+            <p id="task-modal-desc" class="text-gray-300 mb-4">Описание</p>
+            <div id="task-modal-actions" class="space-y-2"></div>
+            <button onclick="closeTaskModal()" class="btn-action w-full glass rounded-lg p-3 mt-4 hover:bg-red-500/10">Закрыть</button>
         </div>
     </div>
 
     <script>
         // Game State
         const state = {
-            authority: 0,
-            tea: 10,
+            authority: 100,
+            tea: 50,
             fines: 0,
             energy: 100,
-            catMood: 100,
-            autoDecree: 0,
-            autoTea: 0,
-            decreePower: 1,
-            teaPower: 1,
-            catPower: 1,
-            fineReduction: 0,
+            budget: 50000,
+            rating: 50,
+            day: 1,
             tick: 0,
             gameOver: false,
-            achievements: new Set()
+            achievements: new Set(),
+            inventory: {
+                paper: 100,
+                cleaning: 50,
+                tools: 20,
+                tea: 30,
+                coffee: 20,
+                toilet: 40
+            },
+            staff: [
+                { id: 'cleaner1', name: 'Уборщица Мария', role: 'Уборка', salary: 15000, efficiency: 70, hired: true },
+                { id: 'plumber', name: 'Сантехник Иван', role: 'Ремонт', salary: 25000, efficiency: 80, hired: true },
+                { id: 'cleaner2', name: 'Уборщик Петр', role: 'Уборка', salary: 15000, efficiency: 60, hired: false }
+            ],
+            tasks: [
+                { id: 'task1', title: 'Проверить актовый зал', desc: 'Осмотреть состояние после вчерашнего мероприятия', reward: 50, energy: 10, completed: false },
+                { id: 'task2', title: 'Заполнить ведомость', desc: 'Составить отчет по расходам за неделю', reward: 30, energy: 15, completed: false },
+                { id: 'task3', title: 'Обойти кабинеты', desc: 'Проверить чистоту и порядок', reward: 40, energy: 12, completed: false }
+            ],
+            repairs: [
+                { id: 'repair1', title: 'Протечка в туалете', cost: 5000, completed: false, urgent: true },
+                { id: 'repair2', title: 'Сломанная дверь', cost: 3000, completed: false, urgent: false },
+                { id: 'repair3', title: 'Неисправное отопление', cost: 15000, completed: false, urgent: true }
+            ]
         };
 
-        const UPGRADES = [
-            { id: 'mop', name: '🧹 Золотая швабра', desc: 'Авто-херня: +1/5с', cost: 50, costType: 'authority', effect: () => { state.autoDecree += 1; }, bought: false },
-            { id: 'samovar', name: '☕ Кофемашина в кабинет', desc: 'Авто-чай: +2/5с', cost: 40, costType: 'authority', effect: () => { state.autoTea += 2; }, bought: false },
-            { id: 'mustache', name: '📋 Левая ведомость', desc: 'Сила херни x2', cost: 150, costType: 'authority', effect: () => { state.decreePower *= 2; }, bought: false },
-            { id: 'catnip', name: ' Рыбка для Барсика', desc: 'Сила кота x2', cost: 100, costType: 'authority', effect: () => { state.catPower *= 2; }, bought: false },
-            { id: 'bribe', name: '💼 Бутылка директору', desc: 'Штрафы -50%', cost: 200, costType: 'authority', effect: () => { state.fineReduction += 0.5; }, bought: false },
-            { id: 'teapot', name: '🛋️ Диван в кабинет', desc: 'Сила чая x2', cost: 80, costType: 'authority', effect: () => { state.teaPower *= 2; }, bought: false }
+        const SHOP_ITEMS = [
+            { id: 'paper', name: '📄 Бумага А4', cost: 500, amount: 50, desc: 'Для документов' },
+            { id: 'cleaning', name: '🧴 Моющие средства', cost: 800, amount: 30, desc: 'Для уборки' },
+            { id: 'tools', name: '🔧 Инструменты', cost: 2000, amount: 10, desc: 'Для ремонтов' },
+            { id: 'tea', name: '🍵 Чай', cost: 300, amount: 20, desc: 'Для буфета' },
+            { id: 'coffee', name: ' Кофе', cost: 600, amount: 15, desc: 'Для бухгалтерии' },
+            { id: 'toilet', name: '🧻 Туалетная бумага', cost: 400, amount: 40, desc: 'Расходник' }
         ];
 
         const EVENTS = [
             {
-                icon: '👠', title: 'Директор Донсков вернулся раньше!',
-                text: 'Директор ГБУ ЯНАО ЦСОН «Гармония» внезапно вернулся из Салехарда и идёт к вашему кабинету! На столе — карты, беляши и кот Барсик!',
+                icon: '', title: 'Донсков Г.В. вызывает!',
+                text: 'Директор Донсков Григорий Владимирович требует вас в кабинет для отчета!',
                 choices: [
-                    { text: '🍵 Предложить чай с беляшом (шанс 50%)', effect: () => { if (Math.random() > 0.5) { state.fines -= 10; logEvent('✅ Директор соблазнилась беляшом и ушла! Штрафы -10', 'green'); } else { state.fines += 15; logEvent(' Директор в ярости! "Это что за свинарник?!" Штраф +15', 'red'); } } },
-                    { text: '🧹 Схватить швабру и делать вид', effect: () => { state.fines += 5; state.energy -= 10; logEvent('🧹 Вы трёте шваброй воздух. Директор не поверила. Штраф +5', 'red'); } }
+                    { text: '📊 Подготовить отчет (Энергия -20)', effect: () => { state.energy -= 20; state.authority += 20; logEvent('✅ Отчет сдан! Донсков доволен. Авторитет +20', 'green'); } },
+                    { text: ' Сослаться на занятость', effect: () => { state.fines += 10; logEvent('❌ Донсков недоволен! Штраф +10', 'red'); } }
                 ]
             },
             {
-                icon: '💧', title: 'Прорвало трубу в актовом зале!',
-                text: 'Сантехник в отпуске. Актовый зал ЦСОН «Гармония» превращается в бассейн. Что делать, завхоз?',
+                icon: '💧', title: 'Авария!',
+                text: 'Прорвало трубу в актовом зале! Нужны срочные меры!',
                 choices: [
-                    { text: '📋 Издать акт о "плановых работах"', effect: () => { state.authority += 30; state.energy -= 20; logEvent('📋 Акт издан! Вода — это "гидромассаж для пенсионеров". Херня +30', 'green'); } },
-                    { text: ' Пить чай и наблюдать', effect: () => { state.tea += 20; state.fines += 10; logEvent('🍵 Красивое зрелище! Чай +20, но Штраф +10', 'blue'); } }
+                    { text: '🔧 Вызвать сантехника (Бюджет -5000)', effect: () => { if (state.budget >= 5000) { state.budget -= 5000; state.authority += 30; logEvent('✅ Сантехник приехал! Проблема решена. Авторитет +30', 'green'); } else { state.fines += 20; logEvent('❌ Нет денег! Донсков в ярости! Штраф +20', 'red'); } } },
+                    { text: '🪣 Поставить ведро', effect: () => { state.fines += 15; logEvent('️ Временное решение. Донсков недоволен. Штраф +15', 'red'); } }
                 ]
             },
             {
-                icon: '🐈', title: 'Барсик уронил сервер!',
-                text: 'Кот Барсик, сидя на серверном шкафу, скинул важный отчёт для Департамента соцзащиты ЯНАО в окно!',
+                icon: '📦', title: 'Поставка материалов',
+                text: 'Приехала машина с материалами. Нужно принять и разместить на складе.',
                 choices: [
-                    { text: '🐱 Свалить на стажёра (Чай -10)', effect: () => { if (state.tea >= 10) { state.tea -= 10; state.catMood = 100; logEvent('😈 Стажёр виноват! Барсик доволен. Настроение 100%', 'purple'); } else { state.fines += 10; logEvent('❌ Стажёр уволился! Директор в ярости. Штраф +10', 'red'); } } },
-                    { text: ' Написать новый отчёт (Энергия -30)', effect: () => { state.energy -= 30; state.authority += 15; logEvent('📄 Отчёт написан! Херня +15 (потому что написан от руки)', 'green'); } }
+                    { text: '✅ Принять по накладной', effect: () => { state.inventory.paper += 50; state.inventory.cleaning += 30; logEvent('📦 Материалы приняты! Бумага +50, Моющие +30', 'green'); } },
+                    { text: '📋 Проверить качество', effect: () => { state.energy -= 10; state.inventory.paper += 50; logEvent('✅ Качество проверено. Бумага +50', 'blue'); } }
                 ]
             },
             {
-                icon: '', title: 'День пожилого человека в «Гармонии»!',
-                text: 'Пенсионеры собрались в актовом зале. Все ждут развлечений! Директор смотрит на вас.',
+                icon: '', title: 'Жалоба от сотрудника',
+                text: 'Бухгалтер жалуется на холод в кабинете!',
                 choices: [
-                    { text: '💃 Станцевать лезгинку с Барсиком', effect: () => { state.authority += 40; state.catMood += 20; logEvent('💃 Легендарный танец! Пенсионеры в восторге! Херня +40', 'green'); } },
-                    { text: '📜 Зачитать инвентарную ведомость', effect: () => { state.authority += 20; state.energy -= 15; logEvent('📜 Пенсионеры уснули. Директор довольна "тишиной". Херня +20', 'yellow'); } }
-                ]
-            },
-            {
-                icon: '👴', title: 'Совет ветеранов требует...',
-                text: 'Ветераны труда требуют увеличить пенсию в виде талонов на беляши из буфета!',
-                choices: [
-                    { text: '🥟 Выдать беляши (Чай -15)', effect: () => { if (state.tea >= 15) { state.tea -= 15; state.authority += 50; logEvent(' Беляши выданы! Ветераны счастливы. Херня +50', 'green'); } else { state.fines += 20; logEvent('❌ Беляшей нет! Бунт в буфете! Штраф +20', 'red'); } } },
-                    { text: '🗣️ Произнести речь о "тяжёлой доле"', effect: () => { state.authority += 10; logEvent('🗣️ Речь произнесена. Ветераны поплакали. Херня +10', 'yellow'); } }
-                ]
-            },
-            {
-                icon: '📦', title: 'Приехала поставка туалетной бумаги!',
-                text: 'Машина с туалетной бумагой для нужд ЦСОН «Гармония» стоит у ворот. Но водитель просит "решить вопрос".',
-                choices: [
-                    { text: '📦 Забрать себе половину (Чай -5)', effect: () => { if (state.tea >= 5) { state.tea -= 5; state.authority += 25; logEvent('😏 Половина бумаги — в ваш кабинет! Херня +25', 'green'); } else { state.fines += 15; logEvent('❌ Водитель уехал! Бумаги нет! Штраф +15', 'red'); } } },
-                    { text: '✅ Принять по накладной', effect: () => { state.authority += 5; logEvent('✅ Бумага на складе. Скучно, но правильно. Херня +5', 'yellow'); } }
-                ]
-            },
-            {
-                icon: '🍵', title: 'Чайный кризис!',
-                text: 'В буфете закончился чай! Сотрудники ЦСОН «Гармония» в панике. Что делать?',
-                choices: [
-                    { text: '🏃 Бежать в магазин за чаем (Энергия -20)', effect: () => { state.energy -= 20; state.tea += 30; logEvent('🏃 Чай куплен! Сотрудники спасены. Чай +30', 'blue'); } },
-                    { text: '🍵 Заварить "чай" из трав с улицы', effect: () => { state.tea += 15; state.fines += 5; logEvent('🌿 Травяной "чай" готов! Чай +15, но Штраф +5 за самодеятельность', 'red'); } }
-                ]
-            },
-            {
-                icon: '☕', title: 'Кофейный бунт!',
-                text: 'Бухгалтерия требует кофе! Но кофемашина сломалась. Завхоз, спасайте ситуацию!',
-                choices: [
-                    { text: '🔧 Починить кофемашину (Энергия -25)', effect: () => { state.energy -= 25; state.tea += 25; state.authority += 20; logEvent('🔧 Кофемашина работает! Чай +25, Херня +20', 'green'); } },
-                    { text: ' Предложить растворимый "3 в 1"', effect: () => { state.tea += 10; state.fines += 8; logEvent('☕ Бухгалтерия в шоке от качества. Чай +10, Штраф +8', 'red'); } }
-                ]
-            },
-            {
-                icon: '🫖', title: 'Чайная церемония с пенсионерами',
-                text: 'Пенсионеры устроили чайную церемонию в актовом зале и требуют участия завхоза!',
-                choices: [
-                    { text: ' Провести мастер-класс по завариванию', effect: () => { state.authority += 35; state.tea -= 10; logEvent('🍵 Мастер-класс проведён! Пенсионеры довольны. Херня +35', 'green'); } },
-                    { text: '🏃 Сбежать через окно', effect: () => { state.fines += 12; logEvent(' Вы сбежали! Но пенсионеры обиделись. Штраф +12', 'red'); } }
+                    { text: '🔧 Починить отопление (Бюджет -3000)', effect: () => { if (state.budget >= 3000) { state.budget -= 3000; state.rating += 10; logEvent('✅ Отопление починено! Рейтинг +10', 'green'); } else { state.fines += 10; logEvent('❌ Нет денег! Жалоба не решена. Штраф +10', 'red'); } } },
+                    { text: '🧥 Выдать обогреватель', effect: () => { state.rating += 5; logEvent('🧥 Обогреватель выдан. Рейтинг +5', 'blue'); } }
                 ]
             }
         ];
 
         const ACHIEVEMENTS_LIST = [
-            { id: 'first_decree', name: '📜 Первая херня', check: () => state.authority >= 5 },
-            { id: 'tea_master', name: ' Чайный сомелье', check: () => state.tea >= 50 },
-            { id: 'cat_lover', name: '🐱 Друг Барсика', check: () => state.catMood >= 100 && state.authority >= 100 },
-            { id: 'authority_500', name: '🏆 Полтысячи херни', check: () => state.authority >= 500 },
-            { id: 'survivor', name: '⚠️ Выживший завхоз', check: () => state.fines >= 50 },
-            { id: 'tea_addict', name: '🫖 Чайный наркоман', check: () => state.tea >= 100 },
-            { id: 'winner', name: '👑 Почётный бездельник ЯНАО', check: () => state.authority >= 1000 }
+            { id: 'first_task', name: '📋 Первая задача', check: () => state.tasks.some(t => t.completed) },
+            { id: 'budget_master', name: '💰 Экономный завхоз', check: () => state.budget >= 100000 },
+            { id: 'authority_500', name: ' Авторитет 500', check: () => state.authority >= 500 },
+            { id: 'day_7', name: '📅 Неделя работы', check: () => state.day >= 7 },
+            { id: 'no_fines', name: '⭐ Без штрафов', check: () => state.day >= 5 && state.fines === 0 }
         ];
 
         // DOM Elements
         const elAuthority = document.getElementById('stat-authority');
         const elTea = document.getElementById('stat-tea');
         const elFines = document.getElementById('stat-fines');
+        const elEnergy = document.getElementById('stat-energy');
         const elBarAuthority = document.getElementById('bar-authority');
         const elBarTea = document.getElementById('bar-tea');
         const elBarFines = document.getElementById('bar-fines');
-        const elEnergy = document.getElementById('energy-val');
-        const elCatMood = document.getElementById('cat-mood');
+        const elBarEnergy = document.getElementById('bar-energy');
+        const elBudget = document.getElementById('game-budget');
+        const elDay = document.getElementById('game-day');
+        const elRating = document.getElementById('game-rating');
         const elLog = document.getElementById('event-log');
-        const elUpgrades = document.getElementById('upgrades-container');
         const elAchievements = document.getElementById('achievements');
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.remove('tab-active'));
+            document.getElementById(`content-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).classList.add('tab-active');
+            updateUI();
+        }
 
         function updateUI() {
             elAuthority.textContent = Math.floor(state.authority);
             elTea.textContent = Math.floor(state.tea);
             elFines.textContent = Math.floor(state.fines);
             elEnergy.textContent = Math.floor(state.energy);
-            elCatMood.textContent = Math.floor(state.catMood);
+            elBudget.textContent = state.budget;
+            elDay.textContent = state.day;
+            elRating.textContent = state.rating;
 
-            elBarAuthority.style.width = Math.min(100, (state.authority / 1000) * 100) + '%';
+            elBarAuthority.style.width = Math.min(100, state.authority / 10) + '%';
             elBarTea.style.width = Math.min(100, state.tea) + '%';
             elBarFines.style.width = Math.min(100, state.fines) + '%';
+            elBarEnergy.style.width = Math.min(100, state.energy) + '%';
 
-            // Update upgrades
-            elUpgrades.innerHTML = UPGRADES.map(u => `
-                <button onclick="buyUpgrade('${u.id}')" ${u.bought || state[u.costType] < u.cost ? 'disabled' : ''} 
-                    class="upgrade-btn glass rounded-lg p-3 text-left ${u.bought ? 'bg-green-500/20 border-green-500/50' : ''}">
-                    <div class="font-bold text-sm">${u.name} ${u.bought ? '✅' : ''}</div>
-                    <div class="text-xs text-gray-400">${u.desc}</div>
-                    <div class="text-xs text-yellow-400 mt-1">${u.bought ? 'Куплено' : `Цена: ${u.cost} 🏆`}</div>
-                </button>
+            // Tasks
+            const tasksList = document.getElementById('tasks-list');
+            tasksList.innerHTML = state.tasks.map(t => `
+                <div class="task-item glass rounded-lg p-3 ${t.completed ? 'opacity-50' : ''}">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="font-bold text-sm">${t.completed ? '✅' : '📋'} ${t.title}</div>
+                            <div class="text-xs text-gray-400 mt-1">${t.desc}</div>
+                            <div class="text-xs text-yellow-400 mt-1">Награда: ${t.reward} | Энергия: ${t.energy}</div>
+                        </div>
+                        ${!t.completed ? `<button onclick="completeTask('${t.id}')" class="btn-action bg-green-500/20 rounded px-3 py-1 text-xs hover:bg-green-500/30">Выполнить</button>` : ''}
+                    </div>
+                </div>
             `).join('');
 
-            // Update achievements
+            // Shop
+            const shopList = document.getElementById('shop-list');
+            shopList.innerHTML = SHOP_ITEMS.map(item => `
+                <div class="glass rounded-lg p-3">
+                    <div class="font-bold text-sm">${item.name}</div>
+                    <div class="text-xs text-gray-400">${item.desc}</div>
+                    <div class="text-xs text-yellow-400 mt-1">${item.cost}₽ за ${item.amount}шт</div>
+                    <button onclick="buyItem('${item.id}')" ${state.budget < item.cost ? 'disabled' : ''} class="btn-action w-full bg-blue-500/20 rounded px-3 py-1 text-xs mt-2 hover:bg-blue-500/30">Купить</button>
+                </div>
+            `).join('');
+
+            // Staff
+            const staffList = document.getElementById('staff-list');
+            staffList.innerHTML = state.staff.map(s => `
+                <div class="staff-card glass rounded-lg p-3">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-sm">${s.name}</div>
+                            <div class="text-xs text-gray-400">${s.role} | Эффективность: ${s.efficiency}%</div>
+                            <div class="text-xs text-yellow-400">Зарплата: ${s.salary}₽/день</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs ${s.hired ? 'text-green-400' : 'text-red-400'}">${s.hired ? '✅ Работает' : '❌ Не нанят'}</div>
+                            ${!s.hired ? `<button onclick="hireStaff('${s.id}')" class="btn-action bg-purple-500/20 rounded px-3 py-1 text-xs mt-2 hover:bg-purple-500/30">Нанять</button>` : ''}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            // Inventory
+            const inventoryList = document.getElementById('inventory-list');
+            inventoryList.innerHTML = Object.entries(state.inventory).map(([key, val]) => `
+                <div class="glass rounded-lg p-3 text-center">
+                    <div class="text-2xl mb-1">${key === 'paper' ? '📄' : key === 'cleaning' ? '🧴' : key === 'tools' ? '🔧' : key === 'tea' ? '🍵' : key === 'coffee' ? '☕' : '🧻'}</div>
+                    <div class="text-xs text-gray-400">${key === 'paper' ? 'Бумага' : key === 'cleaning' ? 'Моющие' : key === 'tools' ? 'Инструменты' : key === 'tea' ? 'Чай' : key === 'coffee' ? 'Кофе' : 'Туал. бумага'}</div>
+                    <div class="text-lg font-bold text-yellow-400">${val}</div>
+                </div>
+            `).join('');
+
+            // Repairs
+            const repairsList = document.getElementById('repairs-list');
+            repairsList.innerHTML = state.repairs.map(r => `
+                <div class="glass rounded-lg p-3 ${r.completed ? 'opacity-50' : ''}">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-sm">${r.completed ? '✅' : r.urgent ? '🚨' : '🔧'} ${r.title}</div>
+                            <div class="text-xs text-yellow-400">Стоимость: ${r.cost}₽</div>
+                        </div>
+                        ${!r.completed ? `<button onclick="doRepair('${r.id}')" ${state.budget < r.cost ? 'disabled' : ''} class="btn-action bg-red-500/20 rounded px-3 py-1 text-xs hover:bg-red-500/30">Починить</button>` : ''}
+                    </div>
+                </div>
+            `).join('');
+
+            // Achievements
             elAchievements.innerHTML = ACHIEVEMENTS_LIST.map(a => {
                 const unlocked = state.achievements.has(a.id);
                 return `<div class="text-sm ${unlocked ? 'text-yellow-400' : 'text-gray-600'}">${unlocked ? a.name : '🔒 ???'}</div>`;
@@ -415,100 +504,115 @@
                 }
             });
 
-            // Check win/lose
+            // Check game over
             if (!state.gameOver) {
-                if (state.authority >= 1000) {
-                    state.gameOver = true;
-                    showEnd(true);
-                } else if (state.fines >= 100) {
+                if (state.fines >= 100) {
                     state.gameOver = true;
                     showEnd(false);
                 }
             }
         }
 
-        function spawnParticle(x, y, text, color) {
-            const el = document.createElement('div');
-            el.className = 'particle';
-            el.textContent = text;
-            el.style.left = x + 'px';
-            el.style.top = y + 'px';
-            el.style.color = color;
-            el.style.fontSize = '1.2rem';
-            document.body.appendChild(el);
-            setTimeout(() => el.remove(), 1500);
-        }
-
         function logEvent(text, color = 'gray') {
             const colors = { green: 'text-green-400', red: 'text-red-400', blue: 'text-blue-400', yellow: 'text-yellow-400', purple: 'text-purple-400', gray: 'text-gray-400' };
             const entry = document.createElement('div');
             entry.className = `log-entry text-sm ${colors[color] || 'text-gray-400'}`;
-            entry.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
+            entry.textContent = `[День ${state.day}] ${text}`;
             elLog.insertBefore(entry, elLog.firstChild);
             if (elLog.children.length > 50) elLog.lastChild.remove();
         }
 
-        function actionDecree(e) {
-            if (state.energy < 10 || state.tea < 2) {
-                logEvent('❌ Не хватает энергии или чая с беляшом!', 'red');
-                document.getElementById('character-img').classList.add('shake');
-                setTimeout(() => document.getElementById('character-img').classList.remove('shake'), 500);
+        function completeTask(taskId) {
+            const task = state.tasks.find(t => t.id === taskId);
+            if (!task || task.completed || state.energy < task.energy) {
+                logEvent('❌ Недостаточно энергии!', 'red');
                 return;
             }
-            state.energy -= 10;
-            state.tea -= 2;
-            const gain = 5 * state.decreePower;
-            state.authority += gain;
-            
-            const rect = e.currentTarget.getBoundingClientRect();
-            spawnParticle(rect.left + rect.width/2, rect.top, `+${gain}`, '#facc15');
+            state.energy -= task.energy;
+            state.authority += task.reward;
+            task.completed = true;
+            logEvent(`✅ Задача выполнена: ${task.title}. Авторитет +${task.reward}`, 'green');
+            updateUI();
+        }
 
-            if (Math.random() < 0.15 * (1 - state.fineReduction)) {
-                const fine = Math.floor(Math.random() * 5) + 3;
-                state.fines += fine;
-                logEvent(`👠 Директор поймала! Штраф +${fine}`, 'red');
-            } else {
-                logEvent(` Херня совершена! Уровень херни +${gain}`, 'green');
+        function buyItem(itemId) {
+            const item = SHOP_ITEMS.find(i => i.id === itemId);
+            if (!item || state.budget < item.cost) {
+                logEvent('❌ Недостаточно бюджета!', 'red');
+                return;
             }
+            state.budget -= item.cost;
+            state.inventory[itemId] += item.amount;
+            logEvent(`🛒 Куплено: ${item.name} x${item.amount}`, 'blue');
+            updateUI();
+        }
+
+        function hireStaff(staffId) {
+            const staff = state.staff.find(s => s.id === staffId);
+            if (!staff || staff.hired) return;
+            staff.hired = true;
+            logEvent(`👥 Нанят: ${staff.name}`, 'purple');
+            updateUI();
+        }
+
+        function doRepair(repairId) {
+            const repair = state.repairs.find(r => r.id === repairId);
+            if (!repair || repair.completed || state.budget < repair.cost) {
+                logEvent('❌ Недостаточно бюджета!', 'red');
+                return;
+            }
+            state.budget -= repair.cost;
+            repair.completed = true;
+            state.authority += 50;
+            state.rating += 10;
+            logEvent(`🔧 Ремонт выполнен: ${repair.title}. Авторитет +50`, 'green');
+            updateUI();
+        }
+
+        function actionPatrol(e) {
+            if (state.energy < 15) {
+                logEvent('❌ Недостаточно энергии!', 'red');
+                return;
+            }
+            state.energy -= 15;
+            state.authority += 20;
+            state.rating += 5;
+            logEvent('🚶 Обход завершен. Авторитет +20, Рейтинг +5', 'green');
             updateUI();
         }
 
         function actionTea(e) {
-            const gain = 10 * state.teaPower;
-            state.tea += gain;
-            state.energy = Math.min(100, state.energy + 20);
-            
-            const rect = e.currentTarget.getBoundingClientRect();
-            spawnParticle(rect.left + rect.width/2, rect.top, `+${gain}🍵`, '#60a5fa');
-            logEvent(`⏰ Время слито с пользой! Чай +${gain}, Энергия +20`, 'blue');
-            updateUI();
-        }
-
-        function actionCat(e) {
-            if (state.catMood < 10) {
-                logEvent('🐱 Барсик не в настроении! Дайте ему рыбку.', 'red');
+            if (state.inventory.tea < 5) {
+                logEvent('❌ Нет чая на складе!', 'red');
                 return;
             }
-            const gain = 8 * state.catPower;
-            state.authority += gain;
-            state.fines = Math.max(0, state.fines - 3);
-            state.catMood = Math.max(0, state.catMood - 5);
-            
-            const rect = e.currentTarget.getBoundingClientRect();
-            spawnParticle(rect.left + rect.width/2, rect.top, `+${gain}`, '#c084fc');
-            document.getElementById('character-img').classList.add('cat-pet');
-            setTimeout(() => document.getElementById('character-img').classList.remove('cat-pet'), 500);
-            logEvent(`🐱 Барсик мурлычет! Херня +${gain}, Штрафы -3`, 'purple');
+            state.inventory.tea -= 5;
+            state.energy = Math.min(100, state.energy + 20);
+            state.tea += 10;
+            logEvent(' Чай выпит. Энергия +20', 'blue');
             updateUI();
         }
 
-        function buyUpgrade(id) {
-            const u = UPGRADES.find(x => x.id === id);
-            if (!u || u.bought || state[u.costType] < u.cost) return;
-            state[u.costType] -= u.cost;
-            u.bought = true;
-            u.effect();
-            logEvent(`🛒 Куплено: ${u.name}`, 'yellow');
+        function actionPaperwork(e) {
+            if (state.energy < 20 || state.inventory.paper < 10) {
+                logEvent('❌ Нужно больше энергии или бумаги!', 'red');
+                return;
+            }
+            state.energy -= 20;
+            state.inventory.paper -= 10;
+            state.authority += 30;
+            logEvent('📄 Документы заполнены. Авторитет +30', 'purple');
+            updateUI();
+        }
+
+        function actionInspect(e) {
+            if (state.energy < 10) {
+                logEvent(' Недостаточно энергии!', 'red');
+                return;
+            }
+            state.energy -= 10;
+            state.rating += 8;
+            logEvent('🔍 Персонал проверен. Рейтинг +8', 'yellow');
             updateUI();
         }
 
@@ -535,16 +639,11 @@
 
         function showEnd(win) {
             const modal = document.getElementById('end-modal');
-            if (win) {
-                document.getElementById('end-icon').textContent = '🏆';
-                document.getElementById('end-title').textContent = 'ПОБЕДА!';
-                document.getElementById('end-title').className = 'text-3xl font-bold text-yellow-400 mb-3';
-                document.getElementById('end-text').textContent = 'Алиев Алладин Балдадашевич достиг 1000 Уровня херни! Директор ГБУ ЯНАО ЦСОН «Гармония» в отчаянии уволилась. Завхоз назначен Почётным бездельником ЯНАО. Кот Барсик получил звание "Заслуженный сотрудник буфета". Слава завхозу!';
-            } else {
-                document.getElementById('end-icon').textContent = '👠';
+            if (!win) {
+                document.getElementById('end-icon').textContent = '';
                 document.getElementById('end-title').textContent = 'УВОЛЕН!';
                 document.getElementById('end-title').className = 'text-3xl font-bold text-red-400 mb-3';
-                document.getElementById('end-text').textContent = 'Директор накопила 100 штрафов и уволила Алиева Алладина Балдадашевича "по статье"! Завхоз вынесен из кабинета вместе с котом Барсиком и шваброй. История закончилась печально...';
+                document.getElementById('end-text').textContent = 'Донсков Григорий Владимирович накопил 100 штрафов и уволил завхоза! Алиев Алладина Балдадашевич покидает ГБУ ЯНАО ЦСОН «Гармония»...';
             }
             modal.classList.remove('hidden');
         }
@@ -552,39 +651,54 @@
         // Random events
         setInterval(() => {
             if (state.gameOver) return;
-            if (Math.random() < 0.15) {
+            if (Math.random() < 0.1) {
                 const event = EVENTS[Math.floor(Math.random() * EVENTS.length)];
                 showModal(event);
             }
-        }, 15000);
+        }, 20000);
 
-        // Auto ticks
+        // Game tick
         setInterval(() => {
             if (state.gameOver) return;
             state.tick++;
             
-            if (state.autoDecree > 0 && state.energy >= 5 && state.tea >= 1) {
-                state.energy -= 2;
-                state.tea -= 1;
-                state.authority += state.autoDecree * state.decreePower;
-            }
-            if (state.autoTea > 0) {
-                state.tea += state.autoTea;
-            }
-            
-            // Cat mood recovery
-            if (state.tick % 3 === 0) {
-                state.catMood = Math.min(100, state.catMood + 2);
+            // New day every 60 ticks
+            if (state.tick % 60 === 0) {
+                state.day++;
+                state.energy = 100;
+                
+                // Pay salaries
+                const totalSalary = state.staff.filter(s => s.hired).reduce((sum, s) => sum + s.salary, 0);
+                state.budget -= totalSalary;
+                logEvent(`📅 Новый день ${state.day}. Зарплаты выплачены: -${totalSalary}₽`, 'yellow');
+                
+                // Generate new tasks
+                if (Math.random() < 0.5) {
+                    const newTask = {
+                        id: `task${Date.now()}`,
+                        title: ['Проверить склад', 'Обойти территорию', 'Составить отчет', 'Принять поставку'][Math.floor(Math.random() * 4)],
+                        desc: 'Новая задача от директора',
+                        reward: Math.floor(Math.random() * 30) + 20,
+                        energy: Math.floor(Math.random() * 10) + 10,
+                        completed: false
+                    };
+                    state.tasks.push(newTask);
+                    logEvent(`📋 Новая задача: ${newTask.title}`, 'blue');
+                }
             }
             
             // Energy recovery
-            if (state.tick % 2 === 0) {
-                state.energy = Math.min(100, state.energy + 1);
+            if (state.tick % 5 === 0) {
+                state.energy = Math.min(100, state.energy + 2);
             }
 
-            // Random small fine decay
-            if (state.fines > 0 && state.tick % 5 === 0) {
-                state.fines = Math.max(0, state.fines - 1);
+            // Staff work
+            if (state.tick % 10 === 0) {
+                state.staff.filter(s => s.hired).forEach(s => {
+                    if (Math.random() < s.efficiency / 100) {
+                        state.rating += 1;
+                    }
+                });
             }
 
             updateUI();
@@ -592,7 +706,7 @@
 
         // Initial render
         updateUI();
-        logEvent('🎮 Игра началась! Директор уехала. Барсик ждёт ваших указаний!', 'yellow');
+        logEvent('🎮 Игра началась! Добро пожаловать, завхоз!', 'yellow');
     </script>
 </body>
 </html>
