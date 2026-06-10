@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<title>РОСНЕФТЬ ЯНАО — Нефтяной Магнат</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.0/index.css">
+<style>
+  * { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; box-sizing: border-box; }
+  html, body { overscroll-behavior: none; }
+  body {
+    background: #0a0a0a;
+    color: #f5f5f5;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    touch-action: manipulation;
+  }
+  .rn-red { color: #E31E24; }
+  .bg-rn-red { background-color: #E31E24; }
+  .bg-rn-gradient { background: linear-gradient(135deg, #E31E24 0%, #A01418 100%); }
+  .bg-rn-dark { background: linear-gradient(180deg, #111111 0%, #1a1a1a 100%); }
+  .glass { background: rgba(20, 20, 22, 0.85); backdrop-filter: blur(12px); border: 1px solid rgba(227, 30, 36, 0.25); }
+  .glass-dark { background: rgba(15, 15, 18, 0.9); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.08); }
+  .oil-rig-bg {
+    background-image: url('https://image.qwenlm.ai/public_source/d1c31b15-3bbd-44f2-a5df-10066f75a791/1a2e51c7b-0f67-42f4-ae4b-68ce1470a92f.png');
+    background-size: cover;
+    background-position: center;
+  }
+  .click-btn {
+    transition: transform 0.08s, box-shadow 0.2s;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .click-btn:active { transform: scale(0.93); }
+  .click-btn:hover { box-shadow: 0 0 50px rgba(227, 30, 36, 0.6); }
+  .float-text {
+    position: absolute;
+    pointer-events: none;
+    animation: floatUp 1s ease-out forwards;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 0 10px #E31E24, 0 2px 4px rgba(0,0,0,0.8);
+    z-index: 100;
+    font-size: 1.25rem;
+  }
+  @keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-90px) scale(1.4); }
+  }
+  .pulse-red { animation: pulseRed 2s infinite; }
+  @keyframes pulseRed {
+    0%, 100% { box-shadow: 0 0 20px rgba(227, 30, 36, 0.4); }
+    50% { box-shadow: 0 0 45px rgba(227, 30, 36, 0.8); }
+  }
+  .tab-active { background: #E31E24 !important; color: #fff !important; }
+  .upgrade-btn { transition: all 0.15s; }
+  .upgrade-btn:active:not(:disabled) { transform: scale(0.97); }
+  .upgrade-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .event-toast {
+    animation: slideIn 0.4s ease-out, fadeOut 0.5s ease-in 3.5s forwards;
+  }
+  @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+  @keyframes fadeOut { to { opacity: 0; transform: translateY(-20px); } }
+  .scroll-custom::-webkit-scrollbar { width: 4px; }
+  .scroll-custom::-webkit-scrollbar-track { background: transparent; }
+  .scroll-custom::-webkit-scrollbar-thumb { background: #E31E24; border-radius: 2px; }
+  .region-locked { filter: grayscale(1); opacity: 0.55; }
+  .achievement-unlocked { border-color: #E31E24 !important; box-shadow: 0 0 15px rgba(227, 30, 36, 0.5); }
+  .stat-card { transition: transform 0.15s; }
+  .stat-card:active { transform: scale(0.97); }
+  .btn-primary { background: linear-gradient(135deg, #E31E24, #A01418); color: #fff; font-weight: 700; transition: all 0.15s; }
+  .btn-primary:active:not(:disabled) { transform: scale(0.96); }
+  .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-danger { background: linear-gradient(135deg, #7f1d1d, #450a0a); color: #fff; font-weight: 700; transition: all 0.15s; }
+  .btn-danger:active { transform: scale(0.96); }
+  .btn-secondary { background: rgba(227, 30, 36, 0.12); border: 1px solid rgba(227, 30, 36, 0.4); color: #fff; transition: all 0.15s; }
+  .btn-secondary:active { background: rgba(227, 30, 36, 0.25); }
+  .bottom-nav { padding-bottom: env(safe-area-inset-bottom); }
+  .content-pad { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+  .header-pad { padding-top: env(safe-area-inset-top); }
+  .shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+  @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+  .badge-rn { background: #E31E24; color: #fff; font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="app" class="min-h-screen flex flex-col">
+  <!-- Header -->
+  <header class="glass sticky top-0 z-40 header-pad shadow-lg">
+    <div class="px-4 py-3">
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2">
+          <div class="w-9 h-9 bg-rn-gradient rounded-lg flex items-center justify-center font-black text-white text-lg shadow-lg">РН</div>
+          <div>
+            <h1 class="text-base font-black text-white leading-tight">РОСНЕФТЬ ЯНАО</h1>
+            <div class="text-[10px] text-gray-400 leading-tight">Нефтяной Магнат • v2.0</div>
+          </div>
+        </div>
+        <div class="flex gap-1.5">
+          <button onclick="saveGame()" class="btn-secondary px-2.5 py-1.5 rounded text-xs font-bold">💾</button>
+          <button onclick="resetGame()" class="btn-danger px-2.5 py-1.5 rounded text-xs font-bold">🔄</button>
+        </div>
+      </div>
+      <div class="grid grid-cols-3 gap-2">
+        <div class="stat-card glass-dark rounded-lg p-2.5">
+          <div class="text-[10px] text-gray-400 uppercase tracking-wide">💰 Баланс</div>
+          <div class="text-sm font-black text-white leading-tight mt-0.5" id="stat-money">$0</div>
+        </div>
+        <div class="stat-card glass-dark rounded-lg p-2.5">
+          <div class="text-[10px] text-gray-400 uppercase tracking-wide"> Нефть</div>
+          <div class="text-sm font-black text-amber-400 leading-tight mt-0.5" id="stat-oil">0 б</div>
+        </div>
+        <div class="stat-card glass-dark rounded-lg p-2.5">
+          <div class="text-[10px] text-gray-400 uppercase tracking-wide">📈 Доход/с</div>
+          <div class="text-sm font-black text-green-400 leading-tight mt-0.5" id="stat-income">$0/с</div>
+        </div>
+      </div>
+      <div class="mt-2 flex items-center justify-between text-[10px] px-1">
+        <span class="text-gray-400"> <span id="stat-level" class="text-white font-bold">1</span> • <span id="stat-title" class="text-amber-300 font-semibold">Начинающий добытчик</span></span>
+        <span class="text-gray-400">💹 <span id="stat-price" class="text-blue-400 font-bold">$50</span>/б</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Event Toasts -->
+  <div id="events-container" class="fixed top-20 right-2 z-50 flex flex-col gap-1.5 w-72 pointer-events-none"></div>
+
+  <!-- Main Content -->
+  <main class="flex-1 w-full content-pad">
+    <!-- Tab: Clicker (Home) -->
+    <div id="tab-home" class="tab-page px-4 py-4 space-y-4">
+      <div class="glass rounded-2xl p-5 text-center relative overflow-hidden">
+        <div class="absolute inset-0 oil-rig-bg opacity-30"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-transparent via-black/40 to-black/80"></div>
+        <div class="relative z-10">
+          <h2 class="text-lg font-black mb-1 text-white">🛢 ДОБЫЧА НЕФТИ</h2>
+          <p class="text-xs text-gray-300 mb-4">Ямало-Ненецкий автономный округ</p>
+          <div class="relative inline-block mx-auto">
+            <button id="click-btn" class="click-btn pulse-red rounded-full w-52 h-52 mx-auto flex items-center justify-center border-4 border-red-600 shadow-2xl" onclick="handleClick(event)">
+              <div class="bg-gradient-to-br from-red-700 to-red-900 rounded-full w-44 h-44 flex items-center justify-center shadow-inner">
+                <span class="text-7xl drop-shadow-lg">🛢</span>
+              </div>
+            </button>
+          </div>
+          <p class="mt-4 text-sm text-gray-300">+<span id="click-power" class="font-bold text-white">1</span> б/клик</p>
+          <div class="mt-4 grid grid-cols-2 gap-2">
+            <button onclick="sellOil()" class="btn-primary px-4 py-3 rounded-lg text-sm font-bold"> Продать всё</button>
+            <button onclick="sellOil(0.1)" class="btn-secondary px-4 py-3 rounded-lg text-sm font-bold">Продать 10%</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="grid grid-cols-2 gap-2">
+        <div class="glass-dark rounded-xl p-3">
+          <div class="text-[10px] text-gray-400 uppercase">👷 Персонал</div>
+          <div class="text-lg font-black text-white" id="stat-employees">0</div>
+        </div>
+        <div class="glass-dark rounded-xl p-3">
+          <div class="text-[10px] text-gray-400 uppercase"> НПЗ</div>
+          <div class="text-lg font-black text-white" id="stat-refinery">0</div>
+        </div>
+        <div class="glass-dark rounded-xl p-3">
+          <div class="text-[10px] text-gray-400 uppercase"> Логистика</div>
+          <div class="text-lg font-black text-white" id="stat-logistics">0</div>
+        </div>
+        <div class="glass-dark rounded-xl p-3">
+          <div class="text-[10px] text-gray-400 uppercase"> Долг</div>
+          <div class="text-lg font-black text-red-400" id="stat-debt">$0</div>
+        </div>
+      </div>
+
+      <!-- Quick Upgrades -->
+      <div class="glass rounded-2xl p-4">
+        <h3 class="text-base font-black mb-3 text-white flex items-center gap-2">
+          <span class="w-1 h-5 bg-rn-red rounded"></span>⚡ Быстрые улучшения
+        </h3>
+        <div id="quick-upgrades" class="space-y-2 max-h-80 overflow-y-auto scroll-custom pr-1"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Map -->
+    <div id="tab-map" class="tab-page hidden px-4 py-4 space-y-3">
+      <div class="glass rounded-2xl p-4">
+        <h2 class="text-lg font-black mb-1 text-white flex items-center gap-2">
+          <span class="w-1 h-5 bg-rn-red rounded"></span>🗺 Месторождения ЯНАО
+        </h2>
+        <p class="text-xs text-gray-400 mb-4">Открывайте города для увеличения добычи</p>
+        <div id="regions-list" class="space-y-2"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Exchange -->
+    <div id="tab-exchange" class="tab-page hidden px-4 py-4 space-y-3">
+      <div class="glass rounded-2xl p-4">
+        <h2 class="text-lg font-black mb-1 text-white flex items-center gap-2">
+          <span class="w-1 h-5 bg-rn-red rounded"></span>💰 Биржа нефти
+        </h2>
+        <p class="text-xs text-gray-400 mb-4">Цены меняются в реальном времени</p>
+        <div class="glass-dark rounded-xl p-4 text-center mb-4">
+          <div class="text-xs text-gray-400 uppercase tracking-wide">Текущая цена Brent</div>
+          <div class="text-4xl font-black text-blue-400 mt-1" id="ex-price">$50</div>
+          <div class="text-xs text-gray-500 mt-1">за баррель</div>
+        </div>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="sellOil()" class="btn-primary px-3 py-3 rounded-lg text-sm font-bold">💰 Всё (<span id="ex-oil">0</span> б)</button>
+          <button onclick="sellOil(0.5)" class="btn-secondary px-3 py-3 rounded-lg text-sm font-bold">50%</button>
+          <button onclick="sellOil(0.25)" class="btn-secondary px-3 py-3 rounded-lg text-sm font-bold">25%</button>
+          <button onclick="sellOil(0.1)" class="btn-secondary px-3 py-3 rounded-lg text-sm font-bold">10%</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Upgrades -->
+    <div id="tab-upgrades" class="tab-page hidden px-4 py-4 space-y-3">
+      <!-- Refinery -->
+      <div class="glass rounded-2xl p-4">
+        <h3 class="text-base font-black mb-3 text-white flex items-center gap-2">
+          <span class="w-1 h-5 bg-rn-red rounded"></span>🏭 НПЗ
+        </h3>
+        <div class="text-xs text-gray-400 mb-2">Авто-продажа нефти</div>
+        <div class="text-2xl font-black text-white mb-1">Уровень: <span id="up-ref-level" class="rn-red">0</span></div>
+        <div class="text-xs text-gray-400 mb-3">Продажа: <span id="up-ref-sell" class="text-white">0</span> б/с | Бонус: +<span id="up-ref-bonus" class="text-white">0</span>%</div>
+        <button onclick="buildRefinery()" class="btn-primary w-full px-4 py-3 rounded-lg text-sm font-bold" id="btn-ref">🏭 Построить (<span id="up-ref-cost">$1000</span>)</button>
+      </div>
+      <!-- Logistics -->
+      <div class="glass rounded-2xl p-4">
+        <h3 class="text-base font-black mb-3 text-white flex items-center gap-2">
+          <span class="w-1 h-5 bg-rn-red rounded"></span> Логистика
+        </h3>
+        <div class="text-xs text-gray-400 mb-2">Транспорт и трубопроводы</div>
+        <div class="text-2xl font-black text-white mb-1">Уровень: <span id="up-log-level" class="rn-red">0</span></div>
+        <div class="text-xs text-gray-400 mb-3">Бонус к доходу: +<span id="up-log-bonus" class="text-white">0</span>%</div>
+        <button onclick="upgradeLogistics()" class="btn-primary w-full px-4 py-3 rounded-lg text-sm font-bold" id="btn-log">🚛 Улучшить (<span id="up-log-cost">$500</span>)</button>
+      </div>
+      <!-- Employees -->
+      <div class="glass rounded-2xl p-4">
+        <h3 class="text-base font-black mb-3 text-white flex items-center gap-2">
+          <span class="w-1 h-5 bg-rn-red rounded"></span>👷 Персонал
+        </h3>
+        <div class="text-xs text-gray-400 mb-2">Инженеры и операторы</div>
+        <div class="text-2xl font-black text-white mb-1">Сотрудников: <span id="up-emp-count" class="rn-red">0</span></div>
+        <div class="text-xs text-gray-400 mb-3">Добавляют: +<span id="up-emp-bonus" class="text-white">0</span> б/с</div>
+        <button onclick="hireEmployee()" class="btn-primary w-full px-4 py-3 rounded-lg text-sm font-bold" id="btn-emp"> Нанять (<span id="up-emp-cost">$200</span>)</button>
+      </div>
+      <!-- Automation -->
+      <div class="glass rounded-2xl p-4">
+        <h3 class="text-base font-black mb-3 text-white flex items-center gap-2">
+          <span class="w-1 h-5 bg-rn-red rounded"></span>🤖 Автоматизация
+        </h3>
+        <div class="text-xs text-gray-400 mb-2">Цифровые двойники скважин</div>
+        <div class="text-2xl font-black text-white mb-1">Доход: <span id="up-auto-income" class="rn-red">0</span> б/с</div>
+        <button onclick="buyAutomation()" class="btn-primary w-full px-4 py-3 rounded-lg text-sm font-bold" id="btn-auto">🤖 Улучшить (+50 б/с) (<span id="up-auto-cost">$5000</span>)</button>
+      </div>
+    </div>
+
+    <!-- Tab: Bank -->
+    <div id="tab-bank" class="tab-page hidden px-4 py-4 space-y-3">
+      <div class="glass rounded-2xl p-4">
+        <h2 class="text-lg font-black mb-1 text-white flex items-center gap-2">
+          <span class="w-1 h-5 bg-rn-red rounded"></span>🏦 Банк Роснефть
+        </h2>
+        <p class="text-xs text-gray-400 mb-4">Кредитование и инвестиции</p>
+        <div class="glass-dark rounded-xl p-4 text-center mb-4">
+          <div class="text-xs text-gray-400 uppercase tracking-wide">Текущий долг</div>
+          <div class="text-3xl font-black text-red-400 mt-1" id="bn-debt">$0</div>
+          <div class="text-xs text-gray-500 mt-1">Ставка: <span id="bn-rate">1</span>%/сек</div>
+        </div>
+        <div class="space-y-2">
+          <button onclick="repayLoan()" class="btn-primary w-full px-4 py-3 rounded-lg text-sm font-bold" id="btn-repay">💳 Погасить долг</button>
+          <button onclick="takeLoan()" class="btn-danger w-full px-4 py-3 rounded-lg text-sm font-bold">🏦 Взять кредит (<span id="bn-loan-amount">$5000</span>)</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab: Achievements -->
+    <div id="tab-achieve" class="tab-page hidden px-4 py-4 space-y-3">
+      <div class="glass rounded-2xl p-4">
+        <h2 class="text-lg font-black mb-1 text-white flex items-center gap-2">
+          <span class="w-1 h-5 bg-rn-red rounded"></span>🏆 Достижения
+        </h2>
+        <p class="text-xs text-gray-400 mb-4">Путь от добытчика до империи</p>
+        <div id="achieve-list" class="grid grid-cols-1 gap-2"></div>
+      </div>
+    </div>
+
+    <!-- Tab: Graph -->
+    <div id="tab-graph" class="tab-page hidden px-4 py-4 space-y-3">
+      <div class="glass rounded-2xl p-4">
+        <h2 class="text-lg font-black mb-1 text-white flex items-center gap-2">
+          <span class="w-1 h-5 bg-rn-red rounded"></span> Аналитика
+        </h2>
+        <p class="text-xs text-gray-400 mb-4">График прибыли компании</p>
+        <div class="glass-dark rounded-xl p-3">
+          <canvas id="profitChart" height="220"></canvas>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="glass fixed bottom-0 left-0 right-0 z-40 bottom-nav border-t border-red-900/40">
+    <div class="grid grid-cols-5 gap-1 px-2 py-2 max-w-lg mx-auto">
+      <button onclick="switchTab('home')" class="nav-btn flex flex-col items-center py-2 rounded-lg transition" data-tab="home">
+        <span class="text-xl"></span>
+        <span class="text-[10px] font-bold mt-0.5">Добыча</span>
+      </button>
+      <button onclick="switchTab('map')" class="nav-btn flex flex-col items-center py-2 rounded-lg transition" data-tab="map">
+        <span class="text-xl">🗺</span>
+        <span class="text-[10px] font-bold mt-0.5">Карта</span>
+      </button>
+      <button onclick="switchTab('exchange')" class="nav-btn flex flex-col items-center py-2 rounded-lg transition" data-tab="exchange">
+        <span class="text-xl">💰</span>
+        <span class="text-[10px] font-bold mt-0.5">Биржа</span>
+      </button>
+      <button onclick="switchTab('upgrades')" class="nav-btn flex flex-col items-center py-2 rounded-lg transition" data-tab="upgrades">
+        <span class="text-xl">⚡</span>
+        <span class="text-[10px] font-bold mt-0.5">Развитие</span>
+      </button>
+      <button onclick="switchTab('achieve')" class="nav-btn flex flex-col items-center py-2 rounded-lg transition" data-tab="achieve">
+        <span class="text-xl">🏆</span>
+        <span class="text-[10px] font-bold mt-0.5">Награды</span>
+      </button>
+    </div>
+  </nav>
+</div>
+
+<script>
+// ============ GAME STATE ============
+const DEFAULT_STATE = {
+  money: 0,
+  oil: 0,
+  totalOil: 0,
+  totalMoney: 0,
+  clickPower: 1,
+  autoIncome: 0,
+  oilPrice: 50,
+  companyLevel: 1,
+  employees: 0,
+  refineryLevel: 0,
+  logisticsLevel: 0,
+  debt: 0,
+  debtInterest: 0.01,
+  regions: [
+    { id: 'salekhard', name: '🏛 Салехард', desc: 'Столица ЯНАО', unlocked: true, multiplier: 1, cost: 0 },
+    { id: 'gubkinsky', name: ' Губкинский', desc: 'Нефтяная столица', unlocked: false, multiplier: 2.5, cost: 5000 },
+    { id: 'muravlenko', name: '⛽ Муравленко', desc: 'Город нефтяников', unlocked: false, multiplier: 5, cost: 25000 },
+    { id: 'nadym', name: '🌬 Надым', desc: 'Газовая столица', unlocked: false, multiplier: 10, cost: 100000 },
+    { id: 'noyabrsk', name: '🏭 Ноябрьск', desc: 'Крупнейший город', unlocked: false, multiplier: 25, cost: 500000 },
+    { id: 'novy-urengoy', name: '️ Новый Уренгой', desc: 'Газовая мекка', unlocked: false, multiplier: 60, cost: 2500000 },
+    { id: 'labytnangi', name: '🚂 Лабытнанги', desc: 'Ворота в Арктику', unlocked: false, multiplier: 150, cost: 10000000 },
+    { id: 'arctic', name: '🧊 Арктический шельф', desc: 'Карское море', unlocked: false, multiplier: 500, cost: 100000000 }
+  ],
+  upgrades: [
+    { id: 'drill1', name: '🔧 Бур-1', desc: '+1 к клику', cost: 50, type: 'click', power: 1, bought: 0, max: 50, costMult: 1.5 },
+    { id: 'pump1', name: ' Насос', desc: '+1 б/сек', cost: 100, type: 'auto', power: 1, bought: 0, max: 100, costMult: 1.4 },
+    { id: 'pump2', name: '🏗 Глубинный насос', desc: '+5 б/сек', cost: 1000, type: 'auto', power: 5, bought: 0, max: 50, costMult: 1.5 },
+    { id: 'rig1', name: '🏭 Вышка', desc: '+25 б/сек', cost: 10000, type: 'auto', power: 25, bought: 0, max: 30, costMult: 1.6 },
+    { id: 'platform', name: '🌊 Морская платформа', desc: '+150 б/сек', cost: 100000, type: 'auto', power: 150, bought: 0, max: 20, costMult: 1.7 },
+    { id: 'mega', name: '🚀 Мега-бур', desc: '+1000 б/сек', cost: 1000000, type: 'auto', power: 1000, bought: 0, max: 10, costMult: 2.0 },
+    { id: 'click2', name: '💎 Алмазный бур', desc: '+10 к клику', cost: 5000, type: 'click', power: 10, bought: 0, max: 20, costMult: 1.8 },
+    { id: 'click3', name: '⚡ Квантовый бур', desc: '+100 к клику', cost: 100000, type: 'click', power: 100, bought: 0, max: 10, costMult: 2.0 }
+  ],
+  achievements: [
+    { id: 'first_click', name: '🛢 Первый клик', desc: 'Добудьте первую нефть', unlocked: false, condition: s => s.totalOil >= 1 },
+    { id: 'oil_100', name: '🛢 100 баррелей', desc: 'Добудьте 100 баррелей', unlocked: false, condition: s => s.totalOil >= 100 },
+    { id: 'oil_1000', name: '🛢 1000 баррелей', desc: 'Добудьте 1000 баррелей', unlocked: false, condition: s => s.totalOil >= 1000 },
+    { id: 'money_1k', name: '💰 Тысячник', desc: 'Заработайте $1,000', unlocked: false, condition: s => s.totalMoney >= 1000 },
+    { id: 'money_100k', name: '💰 Сто тысяч', desc: 'Заработайте $100,000', unlocked: false, condition: s => s.totalMoney >= 100000 },
+    { id: 'money_1m', name: '💰 Миллионер', desc: 'Заработайте $1,000,000', unlocked: false, condition: s => s.totalMoney >= 1000000 },
+    { id: 'money_1b', name: '💰 Миллиардер', desc: 'Заработайте $1,000,000,000', unlocked: false, condition: s => s.totalMoney >= 1000000000 },
+    { id: 'level_5', name: '🏢 Уровень 5', desc: 'Достигните 5 уровня', unlocked: false, condition: s => s.companyLevel >= 5 },
+    { id: 'level_10', name: ' Уровень 10', desc: 'Достигните 10 уровня', unlocked: false, condition: s => s.companyLevel >= 10 },
+    { id: 'level_20', name: '🏢 Корпорация', desc: 'Достигните 20 уровня', unlocked: false, condition: s => s.companyLevel >= 20 },
+    { id: 'employees_10', name: '👷 Команда', desc: 'Наймите 10 сотрудников', unlocked: false, condition: s => s.employees >= 10 },
+    { id: 'refinery_5', name: '🏭 Промышленник', desc: 'Постройте 5 НПЗ', unlocked: false, condition: s => s.refineryLevel >= 5 },
+    { id: 'all_regions', name: '🌎 Вся Ямалия', desc: 'Откройте все города ЯНАО', unlocked: false, condition: s => s.regions.every(r => r.unlocked) },
+    { id: 'gubkinsky', name: '🛢 Губкинский', desc: 'Откройте Губкинский', unlocked: false, condition: s => s.regions.find(r => r.id === 'gubkinsky').unlocked },
+    { id: 'click_1000', name: '🖱 Кликер', desc: 'Кликните 1000 раз', unlocked: false, condition: s => s.totalClicks >= 1000 }
+  ],
+  totalClicks: 0,
+  priceHistory: [],
+  moneyHistory: [],
+  lastSave: null,
+  startTime: Date.now()
+};
+
+let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+let currentTab = 'home';
+let chartInstance = null;
+let lastTick = Date.now();
+
+// ============ FORMATTING ============
+function formatNum(n) {
+  if (n === undefined || n === null || isNaN(n)) return '0';
+  n = Math.floor(n);
+  if (n >= 1e12) return (n / 1e12).toFixed(2) + 'T';
+  if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+  return n.toString();
+}
+
+function formatMoney(n) {
+  return '$' + formatNum(n);
+}
+
+// ============ COMPANY LEVELS ============
+const TITLES = [
+  'Начинающий добытчик', 'Мелкий предприниматель', 'Владелец скважины', 'Нефтяник ЯНАО',
+  'Директор филиала', 'Нефтяной барон', 'Магнат', 'Олигарх',
+  'Глава корпорации', 'Нефтяной император', 'Президент холдинга', 'Легенда индустрии',
+  'Властелин Ямала', 'Арктический магнат', 'Шельфовый император', 'Бог нефти',
+  'Всемогущий', 'Творец вселенных', 'Абсолют', 'Вечный магнат'
+];
+
+function getCompanyLevel() {
+  const earnings = state.totalMoney;
+  if (earnings >= 1e12) return 20;
+  if (earnings >= 1e11) return 19;
+  if (earnings >= 1e10) return 18;
+  if (earnings >= 1e9) return 17;
+  if (earnings >= 1e8) return 16;
+  if (earnings >= 1e7) return 15;
+  if (earnings >= 1e6) return 14;
+  if (earnings >= 500000) return 13;
+  if (earnings >= 100000) return 12;
+  if (earnings >= 50000) return 11;
+  if (earnings >= 10000) return 10;
+  if (earnings >= 5000) return 9;
+  if (earnings >= 1000) return 8;
+  if (earnings >= 500) return 7;
+  if (earnings >= 100) return 6;
+  if (earnings >= 50) return 5;
+  if (earnings >= 10) return 4;
+  if (earnings >= 1) return 3;
+  return 1;
+}
+
+function getTitle(level) {
+  return TITLES[Math.min(level - 1, TITLES.length - 1)];
+}
+
+// ============ CLICK HANDLER ============
+function handleClick(event) {
+  const regionMultiplier = state.regions.filter(r => r.unlocked).reduce((sum, r) => sum + r.multiplier, 0);
+  const oilGained = state.clickPower * regionMultiplier;
+  state.oil += oilGained;
+  state.totalOil += oilGained;
+  state.totalClicks++;
+
+  const btn = document.getElementById('click-btn');
+  const rect = btn.getBoundingClientRect();
+  const float = document.createElement('div');
+  float.className = 'float-text';
+  float.textContent = '+' + formatNum(oilGained) + ' б';
+  const offsetX = (Math.random() - 0.5) * 60;
+  float.style.left = (event.clientX - rect.left - 20 + offsetX) + 'px';
+  float.style.top = (event.clientY - rect.top - 20) + 'px';
+  btn.parentElement.appendChild(float);
+  setTimeout(() => float.remove(), 1000);
+
+  updateUI();
+}
+
+// ============ SELL OIL ============
+function sellOil(percent = 1) {
+  const amount = Math.floor(state.oil * percent);
+  if (amount <= 0) return;
+  const revenue = amount * state.oilPrice;
+  state.oil -= amount;
+  state.money += revenue;
+  state.totalMoney += revenue;
+  showEvent('💰 Продано ' + formatNum(amount) + ' б за ' + formatMoney(revenue), 'success');
+  updateUI();
+}
+
+// ============ UPGRADES ============
+function buyUpgrade(id) {
+  const upg = state.upgrades.find(u => u.id === id);
+  if (!upg || upg.bought >= upg.max) return;
+  if (state.money < upg.cost) return;
+  state.money -= upg.cost;
+  upg.bought++;
+  if (upg.type === 'click') state.clickPower += upg.power;
+  else if (upg.type === 'auto') state.autoIncome += upg.power;
+  upg.cost = Math.floor(upg.cost * upg.costMult);
+  updateUI();
+}
+
+// ============ REGIONS ============
+function unlockRegion(id) {
+  const region = state.regions.find(r => r.id === id);
+  if (!region || region.unlocked) return;
+  if (state.money < region.cost) return;
+  state.money -= region.cost;
+  region.unlocked = true;
+  showEvent(' Открыт регион: ' + region.name, 'success');
+  updateUI();
+}
+
+// ============ REFINERY ============
+function buildRefinery() {
+  const cost = getRefineryCost();
+  if (state.money < cost) return;
+  state.money -= cost;
+  state.refineryLevel++;
+  showEvent('🏭 НПЗ построен! Уровень: ' + state.refineryLevel, 'success');
+  updateUI();
+}
+function getRefineryCost() { return Math.floor(1000 * Math.pow(1.8, state.refineryLevel)); }
+
+// ============ LOGISTICS ============
+function upgradeLogistics() {
+  const cost = getLogisticsCost();
+  if (state.money < cost) return;
+  state.money -= cost;
+  state.logisticsLevel++;
+  showEvent('🚛 Логистика улучшена! Ур. ' + state.logisticsLevel, 'success');
+  updateUI();
+}
+function getLogisticsCost() { return Math.floor(500 * Math.pow(1.7, state.logisticsLevel)); }
+
+// ============ BANK ============
+function takeLoan() {
+  const amount = Math.max(1000, Math.floor(state.money * 2 + 5000));
+  state.money += amount;
+  state.debt += Math.floor(amount * 1.2);
+  showEvent(' Кредит получен: ' + formatMoney(amount), 'warning');
+  updateUI();
+}
+function repayLoan() {
+  const amount = Math.min(state.money, state.debt);
+  if (amount <= 0) return;
+  state.money -= amount;
+  state.debt -= amount;
+  if (state.debt <= 0) {
+    state.debt = 0;
+    showEvent('🏦 Кредит погашен!', 'success');
+  } else {
+    showEvent('🏦 Выплачено: ' + formatMoney(amount), 'info');
+  }
+  updateUI();
+}
+
+// ============ EMPLOYEES ============
+function hireEmployee() {
+  const cost = getEmployeeCost();
+  if (state.money < cost) return;
+  state.money -= cost;
+  state.employees++;
+  state.autoIncome += 2;
+  showEvent('👷 Сотрудник нанят! Всего: ' + state.employees, 'success');
+  updateUI();
+}
+function getEmployeeCost() { return Math.floor(200 * Math.pow(1.3, state.employees)); }
+
+// ============ AUTOMATION ============
+function buyAutomation() {
+  const cost = getAutomationCost();
+  if (state.money < cost) return;
+  state.money -= cost;
+  state.autoIncome += 50;
+  showEvent('🤖 Автоматизация улучшена! +50 б/с', 'success');
+  updateUI();
+}
+function getAutomationCost() { return Math.floor(5000 * Math.pow(2.0, Math.max(0, Math.floor(state.autoIncome / 50)))); }
+
+// ============ RANDOM EVENTS ============
+const EVENTS = [
+  { text: '📈 Нефть дорожает! Цена x1.5', effect: s => { s.oilPrice *= 1.5; }, type: 'success' },
+  { text: '📉 Обвал рынка! Цена /2', effect: s => { s.oilPrice /= 2; }, type: 'danger' },
+  { text: '🛢 Найдено месторождение! +100 б', effect: s => { s.oil += 100; s.totalOil += 100; }, type: 'success' },
+  { text: '💥 Авария на вышке! -50 б', effect: s => { s.oil = Math.max(0, s.oil - 50); }, type: 'danger' },
+  { text: ' Инвестор вложил $5000', effect: s => { s.money += 5000; s.totalMoney += 5000; }, type: 'success' },
+  { text: '🌊 Шторм в Обской губе! -50% на 10с', effect: s => { s._storm = 10; }, type: 'warning' },
+  { text: '🔥 Пожар на НПЗ! -10% денег', effect: s => { s.money *= 0.9; }, type: 'danger' },
+  { text: '⭐ Бонусный день! Доход x2 на 30с', effect: s => { s._bonus = 30; }, type: 'success' },
+  { text: ' Премия губернатора ЯНАО! +$10000', effect: s => { s.money += 10000; s.totalMoney += 10000; }, type: 'success' },
+  { text: '️ Санкции! Цена нефти -30%', effect: s => { s.oilPrice *= 0.7; }, type: 'danger' }
+];
+
+function triggerRandomEvent() {
+  if (Math.random() > 0.12) return;
+  const event = EVENTS[Math.floor(Math.random() * EVENTS.length)];
+  event.effect(state);
+  showEvent(event.text, event.type);
+}
+
+function showEvent(text, type = 'info') {
+  const container = document.getElementById('events-container');
+  const toast = document.createElement('div');
+  const colors = {
+    success: 'border-l-green-500 bg-green-950/90',
+    danger: 'border-l-red-500 bg-red-950/90',
+    warning: 'border-l-yellow-500 bg-yellow-950/90',
+    info: 'border-l-blue-500 bg-blue-950/90'
+  };
+  toast.className = 'event-toast glass rounded-lg p-3 border-l-4 text-xs text-white ' + (colors[type] || colors.info);
+  toast.textContent = text;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 4000);
+}
+
+// ============ GAME LOOP ============
+function gameTick() {
+  const now = Date.now();
+  const dt = Math.min((now - lastTick) / 1000, 0.5);
+  lastTick = now;
+
+  if (state._storm > 0) { state._storm -= dt; if (state._storm < 0) state._storm = 0; }
+  if (state._bonus > 0) { state._bonus -= dt; if (state._bonus < 0) state._bonus = 0; }
+
+  let income = state.autoIncome;
+  const regionMultiplier = state.regions.filter(r => r.unlocked).reduce((sum, r) => sum + r.multiplier, 0);
+  income *= regionMultiplier;
+  if (state._storm > 0) income *= 0.5;
+  if (state._bonus > 0) income *= 2;
+  income *= (1 + state.refineryLevel * 0.1);
+  income *= (1 + state.logisticsLevel * 0.05);
+
+  const oilGained = income * dt;
+  state.oil += oilGained;
+  state.totalOil += oilGained;
+
+  if (state.refineryLevel > 0) {
+    const autoSellRate = state.refineryLevel * 2 * dt;
+    const toSell = Math.min(state.oil, autoSellRate);
+    if (toSell > 0) {
+      state.oil -= toSell;
+      const revenue = toSell * state.oilPrice;
+      state.money += revenue;
+      state.totalMoney += revenue;
+    }
+  }
+
+  if (Math.random() < 0.08) {
+    const change = (Math.random() - 0.5) * 4;
+    state.oilPrice = Math.max(5, state.oilPrice + change);
+  }
+
+  if (state.debt > 0) state.debt *= (1 + state.debtInterest * dt);
+
+  state.companyLevel = getCompanyLevel();
+
+  state.priceHistory.push({ t: Date.now(), v: state.oilPrice });
+  state.moneyHistory.push({ t: Date.now(), v: state.money });
+  if (state.priceHistory.length > 100) state.priceHistory.shift();
+  if (state.moneyHistory.length > 100) state.moneyHistory.shift();
+
+  triggerRandomEvent();
+  checkAchievements();
+  updateUI();
+}
+
+// ============ ACHIEVEMENTS ============
+function checkAchievements() {
+  state.achievements.forEach(a => {
+    if (!a.unlocked && a.condition(state)) {
+      a.unlocked = true;
+      showEvent('🏆 Достижение: ' + a.name, 'success');
+    }
+  });
+}
+
+// ============ TABS ============
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-page').forEach(p => p.classList.add('hidden'));
+  const target = document.getElementById('tab-' + tab);
+  if (target) target.classList.remove('hidden');
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.classList.remove('tab-active');
+    if (btn.dataset.tab === tab) btn.classList.add('tab-active');
+  });
+  renderTab();
+}
+
+function renderTab() {
+  if (currentTab === 'map') renderMap();
+  else if (currentTab === 'exchange') renderExchange();
+  else if (currentTab === 'upgrades') renderUpgrades();
+  else if (currentTab === 'bank') renderBank();
+  else if (currentTab === 'achieve') renderAchievements();
+  else if (currentTab === 'graph') renderChart();
+}
+
+function renderMap() {
+  const container = document.getElementById('regions-list');
+  let html = '';
+  state.regions.forEach(r => {
+    const unlocked = r.unlocked;
+    html += '<div class="glass-dark rounded-xl p-3 ' + (unlocked ? '' : 'region-locked') + '">';
+    html += '<div class="flex justify-between items-start gap-2">';
+    html += '<div class="flex-1"><div class="font-bold text-sm text-white">' + r.name + '</div>';
+    html += '<div class="text-[10px] text-gray-400">' + r.desc + '</div>';
+    html += '<div class="text-[10px] text-amber-400 mt-1">Множитель: x' + r.multiplier + '</div></div>';
+    if (!unlocked) {
+      html += '<button onclick="unlockRegion(\'' + r.id + '\')" class="btn-primary px-3 py-2 rounded-lg text-xs font-bold shrink-0" ' + (state.money < r.cost ? 'disabled' : '') + '><br>' + formatMoney(r.cost) + '</button>';
+    } else {
+      html += '<div class="text-green-400 text-xs font-bold shrink-0 bg-green-900/40 px-2 py-1 rounded">✅</div>';
+    }
+    html += '</div></div>';
+  });
+  container.innerHTML = html;
+}
+
+function renderExchange() {
+  document.getElementById('ex-price').textContent = formatMoney(state.oilPrice);
+  document.getElementById('ex-oil').textContent = formatNum(state.oil);
+}
+
+function renderUpgrades() {
+  document.getElementById('up-ref-level').textContent = state.refineryLevel;
+  document.getElementById('up-ref-sell').textContent = (state.refineryLevel * 2);
+  document.getElementById('up-ref-bonus').textContent = (state.refineryLevel * 10);
+  document.getElementById('up-ref-cost').textContent = formatMoney(getRefineryCost());
+  document.getElementById('btn-ref').disabled = state.money < getRefineryCost();
+
+  document.getElementById('up-log-level').textContent = state.logisticsLevel;
+  document.getElementById('up-log-bonus').textContent = (state.logisticsLevel * 5);
+  document.getElementById('up-log-cost').textContent = formatMoney(getLogisticsCost());
+  document.getElementById('btn-log').disabled = state.money < getLogisticsCost();
+
+  document.getElementById('up-emp-count').textContent = state.employees;
+  document.getElementById('up-emp-bonus').textContent = (state.employees * 2);
+  document.getElementById('up-emp-cost').textContent = formatMoney(getEmployeeCost());
+  document.getElementById('btn-emp').disabled = state.money < getEmployeeCost();
+
+  document.getElementById('up-auto-income').textContent = formatNum(state.autoIncome);
+  document.getElementById('up-auto-cost').textContent = formatMoney(getAutomationCost());
+  document.getElementById('btn-auto').disabled = state.money < getAutomationCost();
+}
+
+function renderBank() {
+  document.getElementById('bn-debt').textContent = formatMoney(state.debt);
+  document.getElementById('bn-rate').textContent = (state.debtInterest * 100).toFixed(1);
+  document.getElementById('bn-loan-amount').textContent = formatMoney(Math.max(1000, Math.floor(state.money * 2 + 5000)));
+  document.getElementById('btn-repay').disabled = state.money < 1 || state.debt <= 0;
+}
+
+function renderAchievements() {
+  const container = document.getElementById('achieve-list');
+  let html = '';
+  state.achievements.forEach(a => {
+    html += '<div class="glass-dark rounded-xl p-3 ' + (a.unlocked ? 'achievement-unlocked' : 'opacity-60') + '">';
+    html += '<div class="font-bold text-sm text-white">' + a.name + '</div>';
+    html += '<div class="text-[10px] text-gray-400">' + a.desc + '</div>';
+    html += '<div class="text-[10px] mt-1 ' + (a.unlocked ? 'text-green-400' : 'text-gray-500') + '">' + (a.unlocked ? '✅ Получено' : '🔒 Заблокировано') + '</div>';
+    html += '</div>';
+  });
+  container.innerHTML = html;
+}
+
+// ============ CHART ============
+function renderChart() {
+  const ctx = document.getElementById('profitChart');
+  if (!ctx) return;
+  if (chartInstance) chartInstance.destroy();
+
+  const labels = state.moneyHistory.map((h, i) => i);
+  const data = state.moneyHistory.map(h => h.v);
+
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'Капитал ($)',
+        data: data,
+        borderColor: '#E31E24',
+        backgroundColor: 'rgba(227, 30, 36, 0.15)',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: '#f5f5f5', font: { size: 11 } } }
+      },
+      scales: {
+        x: { display: false },
+        y: { ticks: { color: '#9ca3af', font: { size: 10 }, callback: v => '$' + formatNum(v) }, grid: { color: 'rgba(255,255,255,0.05)' } }
+      }
+    }
+  });
+}
+
+// ============ QUICK UPGRADES ============
+function renderQuickUpgrades() {
+  const container = document.getElementById('quick-upgrades');
+  let html = '';
+  state.upgrades.forEach(u => {
+    if (u.bought >= u.max) return;
+    html += '<button onclick="buyUpgrade(\'' + u.id + '\')" class="upgrade-btn w-full glass-dark rounded-lg p-3 text-left flex justify-between items-center gap-2" ' + (state.money < u.cost ? 'disabled' : '') + '>';
+    html += '<div class="flex-1 min-w-0"><div class="font-bold text-xs text-white truncate">' + u.name + '</div>';
+    html += '<div class="text-[10px] text-gray-400 truncate">' + u.desc + ' • ' + u.bought + '/' + u.max + '</div></div>';
+    html += '<div class="text-amber-400 font-bold text-xs shrink-0">' + formatMoney(u.cost) + '</div>';
+    html += '</button>';
+  });
+  container.innerHTML = html;
+}
+
+// ============ UPDATE UI ============
+function updateUI() {
+  document.getElementById('stat-money').textContent = formatMoney(state.money);
+  document.getElementById('stat-oil').textContent = formatNum(state.oil) + ' б';
+  
+  const regionMultiplier = state.regions.filter(r => r.unlocked).reduce((sum, r) => sum + r.multiplier, 0);
+  let income = state.autoIncome * regionMultiplier * (1 + state.refineryLevel * 0.1) * (1 + state.logisticsLevel * 0.05);
+  if (state._bonus > 0) income *= 2;
+  if (state._storm > 0) income *= 0.5;
+  const incomePerSec = income * state.oilPrice;
+  document.getElementById('stat-income').textContent = formatMoney(incomePerSec) + '/с';
+  document.getElementById('stat-price').textContent = formatMoney(state.oilPrice);
+  document.getElementById('stat-level').textContent = state.companyLevel;
+  document.getElementById('stat-title').textContent = getTitle(state.companyLevel);
+  document.getElementById('stat-employees').textContent = state.employees;
+  document.getElementById('stat-refinery').textContent = state.refineryLevel;
+  document.getElementById('stat-logistics').textContent = state.logisticsLevel;
+  document.getElementById('stat-debt').textContent = formatMoney(state.debt);
+  document.getElementById('click-power').textContent = formatNum(state.clickPower * regionMultiplier);
+
+  renderQuickUpgrades();
+  if (currentTab === 'exchange') renderExchange();
+  else if (currentTab === 'upgrades') renderUpgrades();
+  else if (currentTab === 'bank') renderBank();
+}
+
+// ============ SAVE/LOAD ============
+function saveGame() {
+  state.lastSave = Date.now();
+  try {
+    localStorage.setItem('rosneftYnaoSave', JSON.stringify(state));
+    showEvent('💾 Игра сохранена', 'info');
+  } catch(e) {}
+}
+
+function loadGame() {
+  const saved = localStorage.getItem('rosneftYnaoSave');
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+      Object.keys(parsed).forEach(key => {
+        if (key === 'regions' || key === 'upgrades' || key === 'achievements' || key === 'priceHistory' || key === 'moneyHistory') {
+          state[key] = parsed[key];
+        } else if (parsed[key] !== undefined) {
+          state[key] = parsed[key];
+        }
+      });
+    } catch (e) { console.error('Load error', e); }
+  }
+}
+
+function resetGame() {
+  if (confirm('Сбросить весь прогресс? Это действие нельзя отменить!')) {
+    localStorage.removeItem('rosneftYnaoSave');
+    state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+    updateUI();
+    renderTab();
+    showEvent('🔄 Прогресс сброшен', 'warning');
+  }
+}
+
+// ============ INIT ============
+loadGame();
+switchTab('home');
+updateUI();
+
+setInterval(gameTick, 100);
+setInterval(saveGame, 30000);
+</script>
+</body>
+</html>
+
