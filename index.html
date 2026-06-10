@@ -2,10 +2,8 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-capable" content="yes">
-    <title>Кликер Завхоза — Алиев А.Б.</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>💼 Кликер Завхоза PREMIUM | Алиев А.Б.</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.19/cyrillic.css" rel="stylesheet">
     <style>
@@ -13,55 +11,82 @@
             font-family: 'Inter', sans-serif; 
             user-select: none;
             -webkit-tap-highlight-color: transparent;
-            -webkit-touch-callout: none;
             touch-action: manipulation;
-            box-sizing: border-box;
         }
         html, body {
             overflow-x: hidden;
-            position: fixed;
             width: 100%;
             height: 100%;
         }
         body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a3e 50%, #0f3460 100%);
             min-height: 100vh;
             overflow-y: auto;
-            overscroll-behavior: none;
+            position: relative;
         }
+        
+        /* Animated background */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s ease-in-out infinite;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        
         .glass {
             background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
+        .glass-premium {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(234, 179, 8, 0.2);
+        }
+        
         .click-btn {
-            transition: transform 0.1s ease;
+            transition: all 0.1s ease;
             position: relative;
             overflow: hidden;
             cursor: pointer;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-        }
-        .click-btn:active {
-            transform: scale(0.92);
+            background: linear-gradient(135deg, #ffd700, #ff8c00, #ff4500);
+            box-shadow: 0 0 50px rgba(255, 215, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.3);
         }
         .click-btn::before {
             content: '';
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            animation: shine 3s linear infinite;
         }
-        .click-btn:active::before {
-            width: 300px;
-            height: 300px;
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
+        .click-btn:active {
+            transform: scale(0.92);
+            box-shadow: 0 0 30px rgba(255, 215, 0, 0.8);
+        }
+        
         .particle {
             position: fixed;
             pointer-events: none;
@@ -74,6 +99,7 @@
             0% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
             100% { opacity: 0; transform: translateY(-150px) scale(1.5) rotate(360deg); }
         }
+        
         .pulse-glow {
             animation: pulseGlow 2s ease-in-out infinite;
         }
@@ -81,42 +107,55 @@
             0%, 100% { box-shadow: 0 0 30px rgba(234, 179, 8, 0.4); }
             50% { box-shadow: 0 0 60px rgba(234, 179, 8, 0.8); }
         }
+        
         .progress-fill {
             transition: width 0.3s ease-out;
+            background: linear-gradient(90deg, #ffd700, #ff8c00);
         }
+        
         .mission-item { transition: all 0.3s ease; }
-        .mission-item:hover { background: rgba(255,255,255,0.08); }
+        .mission-item:hover { background: rgba(255,255,255,0.08); transform: translateX(5px); }
         .mission-locked { opacity: 0.3; filter: grayscale(100%); }
         .mission-current {
             border: 2px solid rgba(234, 179, 8, 0.8);
-            background: rgba(234, 179, 8, 0.1);
+            background: linear-gradient(135deg, rgba(234, 179, 8, 0.1), rgba(255, 140, 0, 0.1));
             animation: missionPulse 2s ease-in-out infinite;
         }
         @keyframes missionPulse {
             0%, 100% { box-shadow: 0 0 10px rgba(234, 179, 8, 0.3); }
-            50% { box-shadow: 0 0 20px rgba(234, 179, 8, 0.6); }
+            50% { box-shadow: 0 0 25px rgba(234, 179, 8, 0.6); }
         }
+        
         .upgrade-btn { transition: all 0.3s ease; }
-        .upgrade-btn:hover:not(:disabled) { transform: scale(1.02); background: rgba(255,255,255,0.08); }
+        .upgrade-btn:hover:not(:disabled) { transform: scale(1.05); background: rgba(255,255,255,0.15); }
         .upgrade-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-        .tab-active { background: rgba(234, 179, 8, 0.2); border-color: rgba(234, 179, 8, 0.5); }
+        
+        .tab-active { 
+            background: linear-gradient(135deg, rgba(234, 179, 8, 0.3), rgba(255, 140, 0, 0.3));
+            border-color: rgba(234, 179, 8, 0.8);
+            box-shadow: 0 0 15px rgba(234, 179, 8, 0.5);
+        }
+        
         .combo-text { animation: comboAnim 0.5s ease-out; }
         @keyframes comboAnim {
             0% { transform: scale(0) rotate(-10deg); opacity: 0; }
             50% { transform: scale(1.3) rotate(5deg); }
             100% { transform: scale(1) rotate(0deg); opacity: 1; }
         }
+        
         .shake { animation: shake 0.3s ease-in-out; }
         @keyframes shake {
             0%, 100% { transform: translateX(0) rotate(0deg); }
             25% { transform: translateX(-5px) rotate(-2deg); }
             75% { transform: translateX(5px) rotate(2deg); }
         }
+        
         .modal { animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes modalPop {
-            from { opacity: 0; transform: scale(0.8) rotate(-5deg); }
+            from { opacity: 0; transform: scale(0.5) rotate(-10deg); }
             to { opacity: 1; transform: scale(1) rotate(0deg); }
         }
+        
         .bonus-coin {
             position: fixed;
             font-size: 2rem;
@@ -125,75 +164,141 @@
             z-index: 999;
         }
         @keyframes coinFloat {
-            0% { opacity: 1; transform: translateY(0) rotate(0deg); }
-            100% { opacity: 0; transform: translateY(-200px) rotate(720deg); }
+            0% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+            50% { transform: translateY(-100px) rotate(360deg) scale(1.5); }
+            100% { opacity: 0; transform: translateY(-200px) rotate(720deg) scale(0.5); }
         }
+        
         .streak-bar {
             background: linear-gradient(90deg, #ff0000, #ff7700, #ffff00);
             animation: streakGlow 0.5s ease-in-out infinite alternate;
         }
         @keyframes streakGlow {
             from { box-shadow: 0 0 10px rgba(255, 119, 0, 0.5); }
-            to { box-shadow: 0 0 20px rgba(255, 119, 0, 0.8); }
+            to { box-shadow: 0 0 25px rgba(255, 119, 0, 0.9); }
         }
+        
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-        ::-webkit-scrollbar-thumb { background: rgba(234, 179, 8, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #ffd700, #ff8c00); border-radius: 4px; }
         
         .shop-item { transition: all 0.3s ease; }
-        .shop-item:hover:not(.opacity-50) { transform: translateY(-2px); background: rgba(255,255,255,0.08); }
+        .shop-item:hover:not(.opacity-50) { transform: translateY(-5px); background: rgba(255,255,255,0.1); }
+        
         .inventory-item { animation: slideIn 0.3s ease-out; }
         @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
+            from { opacity: 0; transform: translateX(-20px) scale(0.8); }
+            to { opacity: 1; transform: translateX(0) scale(1); }
         }
-        .event-banner {
-            animation: bannerSlide 0.5s ease-out;
+        
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            animation: confettiFall 3s ease-out forwards;
+            z-index: 999;
         }
-        @keyframes bannerSlide {
-            from { transform: translateY(-100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
+        @keyframes confettiFall {
+            0% { opacity: 1; transform: translateY(-100px) rotate(0deg); }
+            100% { opacity: 0; transform: translateY(100vh) rotate(720deg); }
         }
+        
+        .level-up {
+            animation: levelUp 1s ease-out;
+        }
+        @keyframes levelUp {
+            0% { transform: scale(1); filter: brightness(1); }
+            50% { transform: scale(1.3); filter: brightness(2) hue-rotate(180deg); }
+            100% { transform: scale(1); filter: brightness(1); }
+        }
+        
+        .rarity-common { border-left: 3px solid #9ca3af; }
+        .rarity-rare { border-left: 3px solid #3b82f6; }
+        .rarity-epic { border-left: 3px solid #a855f7; }
+        .rarity-legendary { border-left: 3px solid #ffd700; animation: legendaryGlow 2s ease-in-out infinite; }
+        @keyframes legendaryGlow {
+            0%, 100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(255, 215, 0, 0.7); }
+        }
+        
+        .neon-text {
+            text-shadow: 0 0 10px currentColor, 0 0 20px currentColor, 0 0 30px currentColor;
+        }
+        
+        .cat-bounce {
+            animation: catBounce 2s ease-in-out infinite;
+        }
+        @keyframes catBounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
         button { touch-action: manipulation; }
+        
+        .achievement-unlock {
+            animation: achievementPop 0.6s ease-out;
+        }
+        @keyframes achievementPop {
+            0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(10deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
     </style>
 </head>
 <body class="text-white">
-    <div id="app" class="max-w-7xl mx-auto p-3 md:p-6 pb-20">
+    <!-- Animated Background -->
+    <div class="bg-animation" id="bg-animation"></div>
+    
+    <div id="app" class="max-w-7xl mx-auto p-3 md:p-6 pb-20 relative z-10">
         <!-- Header -->
         <header class="text-center mb-4">
-            <h1 class="text-2xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 bg-clip-text text-transparent">
-                💼 Кликер Завхоза
+            <h1 class="text-3xl md:text-5xl font-bold bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 bg-clip-text text-transparent neon-text">
+                💼 КЛИКЕР ЗАВХОЗА
             </h1>
             <p class="text-gray-400 text-xs md:text-sm mt-1">ГБУ ЯНАО ЦСОН «Гармония»</p>
-            <p class="text-yellow-400/80 text-xs mt-1 italic">Создано лично для Алиева Аладдина Балдадашевича</p>
+            <p class="text-yellow-400/80 text-xs mt-1 italic">✨ Создано лично для Алиева Аладдина Балдадашевича </p>
         </header>
 
         <!-- Stats -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3 mb-3">
-            <div class="glass rounded-lg p-2 md:p-3">
+            <div class="glass-premium rounded-xl p-3">
                 <div class="text-xs text-gray-400">💰 Рубли</div>
-                <div id="stat-rubles" class="text-lg md:text-xl font-bold text-yellow-400">0</div>
+                <div id="stat-rubles" class="text-xl md:text-2xl font-bold text-yellow-400 neon-text">0</div>
             </div>
-            <div class="glass rounded-lg p-2 md:p-3">
-                <div class="text-xs text-gray-400">⚡ За клик</div>
-                <div id="stat-power" class="text-lg md:text-xl font-bold text-green-400">1₽</div>
+            <div class="glass-premium rounded-xl p-3">
+                <div class="text-xs text-gray-400"> За клик</div>
+                <div id="stat-power" class="text-xl md:text-2xl font-bold text-green-400">1₽</div>
             </div>
-            <div class="glass rounded-lg p-2 md:p-3">
+            <div class="glass-premium rounded-xl p-3">
                 <div class="text-xs text-gray-400">🎯 Миссия</div>
-                <div id="stat-mission" class="text-lg md:text-xl font-bold text-blue-400">1/25</div>
+                <div id="stat-mission" class="text-xl md:text-2xl font-bold text-blue-400">1/25</div>
             </div>
-            <div class="glass rounded-lg p-2 md:p-3">
-                <div class="text-xs text-gray-400">🔥 Комбо</div>
-                <div id="stat-combo" class="text-lg md:text-xl font-bold text-red-400">x1</div>
+            <div class="glass-premium rounded-xl p-3">
+                <div class="text-xs text-gray-400"> Комбо</div>
+                <div id="stat-combo" class="text-xl md:text-2xl font-bold text-red-400">x1</div>
+            </div>
+        </div>
+
+        <!-- Level & Rank -->
+        <div class="glass-premium rounded-xl p-3 mb-3">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-sm font-bold text-yellow-400">🏆 Уровень завхоза</span>
+                <span id="rank-name" class="text-sm font-bold text-purple-400">Стажёр</span>
+            </div>
+            <div class="w-full bg-gray-700 rounded-full h-3">
+                <div id="level-bar" class="progress-fill h-3 rounded-full" style="width: 0%"></div>
+            </div>
+            <div class="text-xs text-gray-400 mt-1 text-center">
+                Уровень <span id="level-num">1</span> | <span id="level-progress">0</span>/<span id="level-required">100</span> кликов
             </div>
         </div>
 
         <!-- Streak Bar -->
         <div id="streak-container" class="hidden mb-3">
-            <div class="glass rounded-lg p-2 md:p-3 border-2 border-orange-500/50">
+            <div class="glass-premium rounded-xl p-3 border-2 border-orange-500/50">
                 <div class="flex justify-between items-center mb-1">
-                    <span class="text-xs md:text-sm font-bold text-orange-400">⚡ СТРИК! x2 БОНУС!</span>
-                    <span id="streak-timer" class="text-xs md:text-sm font-bold text-yellow-400">10с</span>
+                    <span class="text-sm font-bold text-orange-400 neon-text">⚡ СТРИК! x2 БОНУС!</span>
+                    <span id="streak-timer" class="text-sm font-bold text-yellow-400">10с</span>
                 </div>
                 <div class="w-full bg-gray-700 rounded-full h-2">
                     <div id="streak-bar" class="streak-bar h-2 rounded-full progress-fill" style="width: 100%"></div>
@@ -202,11 +307,11 @@
         </div>
 
         <!-- Current Mission -->
-        <div class="glass rounded-xl p-3 md:p-4 mb-3 text-center border-2 border-yellow-500/50">
+        <div class="glass-premium rounded-xl p-4 mb-3 text-center border-2 border-yellow-500/50">
             <div class="text-xs text-gray-400 mb-1">🎯 ТЕКУЩАЯ МИССИЯ</div>
-            <div id="current-mission-display" class="text-sm md:text-lg font-bold text-yellow-400">Загрузка...</div>
-            <div class="w-full bg-gray-700 rounded-full h-2 md:h-3 mt-2">
-                <div id="current-mission-bar" class="bg-gradient-to-r from-yellow-400 to-orange-500 h-2 md:h-3 rounded-full progress-fill" style="width: 0%"></div>
+            <div id="current-mission-display" class="text-base md:text-lg font-bold text-yellow-400">Загрузка...</div>
+            <div class="w-full bg-gray-700 rounded-full h-3 mt-2">
+                <div id="current-mission-bar" class="progress-fill h-3 rounded-full" style="width: 0%"></div>
             </div>
             <div class="text-xs text-gray-400 mt-1">
                 <span id="current-mission-progress">0</span> / <span id="current-mission-target">10</span>
@@ -215,84 +320,95 @@
 
         <!-- Main Click Button -->
         <div class="text-center mb-4">
-            <button id="main-click-btn" onclick="handleClick(event)" class="click-btn w-56 h-56 md:w-72 md:h-72 rounded-full bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 shadow-2xl pulse-glow flex flex-col items-center justify-center mx-auto">
-                <div id="btn-emoji" class="text-5xl md:text-7xl mb-1">💰</div>
-                <div class="text-lg md:text-2xl font-bold text-white">КЛИК!</div>
-                <div class="text-xs md:text-sm text-white/80 mt-1">+<span id="click-value">1</span>₽</div>
+            <button id="main-click-btn" onclick="handleClick(event)" class="click-btn w-56 h-56 md:w-72 md:h-72 rounded-full flex flex-col items-center justify-center mx-auto pulse-glow">
+                <div id="btn-emoji" class="text-5xl md:text-7xl mb-1 relative z-10">💰</div>
+                <div class="text-xl md:text-2xl font-bold text-white relative z-10">КЛИК!</div>
+                <div class="text-sm md:text-base text-white/90 mt-1 relative z-10">+<span id="click-value">1</span>₽</div>
             </button>
-            <div id="combo-display" class="mt-3 text-xl md:text-2xl font-bold text-red-400 hidden combo-text">
-                🔥 КОМБО x<span id="combo-multiplier">1</span>!
+            <div id="combo-display" class="mt-3 text-2xl md:text-3xl font-bold text-red-400 hidden combo-text neon-text">
+                 КОМБО x<span id="combo-multiplier">1</span>!
             </div>
-            <p class="text-gray-500 text-xs mt-2 italic">"Пока директор в отпуске — я тут главный!"</p>
+            <p class="text-gray-500 text-xs mt-2 italic" id="random-joke">"Пока директор в отпуске — я тут главный!"</p>
         </div>
 
         <!-- Tabs -->
         <div class="flex flex-wrap gap-1 md:gap-2 mb-3 justify-center">
             <button onclick="switchTab('missions')" id="tab-missions" class="glass rounded-lg px-3 md:px-4 py-2 text-xs md:text-sm tab-active">📋 Миссии</button>
             <button onclick="switchTab('shop')" id="tab-shop" class="glass rounded-lg px-3 md:px-4 py-2 text-xs md:text-sm">🛒 Магазин</button>
-            <button onclick="switchTab('upgrades')" id="tab-upgrades" class="glass rounded-lg px-3 md:px-4 py-2 text-xs md:text-sm">⚡ Прокачка</button>
-            <button onclick="switchTab('inventory')" id="tab-inventory" class="glass rounded-lg px-3 md:px-4 py-2 text-xs md:text-sm">📦 Склад</button>
-            <button onclick="switchTab('achievements')" id="tab-achievements" class="glass rounded-lg px-3 md:px-4 py-2 text-xs md:text-sm">🏆</button>
+            <button onclick="switchTab('upgrades')" id="tab-upgrades" class="glass rounded-lg px-3 md:px-4 py-2 text-xs md:text-sm"> Прокачка</button>
+            <button onclick="switchTab('inventory')" id="tab-inventory" class="glass rounded-lg px-3 md:px-4 py-2 text-xs md:text-sm"> Склад</button>
+            <button onclick="switchTab('achievements')" id="tab-achievements" class="glass rounded-lg px-3 md:px-4 py-2 text-xs md:text-sm">🏆 Достижения</button>
+            <button onclick="switchTab('minigame')" id="tab-minigame" class="glass rounded-lg px-3 md:px-4 py-2 text-xs md:text-sm">🎮 Мини-игра</button>
         </div>
 
         <!-- Tab Content -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-3 md:gap-4">
             <div class="lg:col-span-2">
-                <!-- Missions -->
                 <div id="content-missions" class="tab-content">
-                    <div class="glass rounded-xl p-3 md:p-4">
-                        <h3 class="text-base md:text-lg font-bold text-yellow-400 mb-3">📋 Миссии завхоза (по порядку)</h3>
+                    <div class="glass-premium rounded-xl p-4">
+                        <h3 class="text-lg md:text-xl font-bold text-yellow-400 mb-3">📋 Миссии завхоза</h3>
                         <div id="missions-list" class="space-y-2 max-h-96 overflow-y-auto"></div>
                     </div>
                 </div>
 
-                <!-- Shop -->
                 <div id="content-shop" class="tab-content hidden">
-                    <div class="glass rounded-xl p-3 md:p-4">
-                        <h3 class="text-base md:text-lg font-bold text-green-400 mb-2">🛒 Магазин завхоза</h3>
-                        <p class="text-xs text-gray-400 mb-3">Покупай ништяки для кабинета и бонусы!</p>
+                    <div class="glass-premium rounded-xl p-4">
+                        <h3 class="text-lg md:text-xl font-bold text-green-400 mb-2">🛒 Магазин ништяков</h3>
+                        <p class="text-xs text-gray-400 mb-3">Покупай всё что душе угодно!</p>
                         <div id="shop-list" class="grid grid-cols-1 md:grid-cols-2 gap-2"></div>
                     </div>
                 </div>
 
-                <!-- Upgrades -->
                 <div id="content-upgrades" class="tab-content hidden">
-                    <div class="glass rounded-xl p-3 md:p-4">
-                        <h3 class="text-base md:text-lg font-bold text-blue-400 mb-3">⚡ Прокачка кнопки</h3>
+                    <div class="glass-premium rounded-xl p-4">
+                        <h3 class="text-lg md:text-xl font-bold text-blue-400 mb-3">⚡ Прокачка кнопки</h3>
                         <div id="upgrades-list" class="grid grid-cols-1 md:grid-cols-2 gap-2"></div>
                     </div>
                 </div>
 
-                <!-- Inventory -->
                 <div id="content-inventory" class="tab-content hidden">
-                    <div class="glass rounded-xl p-3 md:p-4">
-                        <h3 class="text-base md:text-lg font-bold text-purple-400 mb-3">📦 Склад завхоза</h3>
-                        <p class="text-xs text-gray-400 mb-3">Всё что накопил — твоё! (пока директор не видит)</p>
+                    <div class="glass-premium rounded-xl p-4">
+                        <h3 class="text-lg md:text-xl font-bold text-purple-400 mb-3">📦 Склад завхоза</h3>
                         <div id="inventory-list" class="grid grid-cols-2 md:grid-cols-3 gap-2"></div>
                     </div>
                 </div>
 
-                <!-- Achievements -->
                 <div id="content-achievements" class="tab-content hidden">
-                    <div class="glass rounded-xl p-3 md:p-4">
-                        <h3 class="text-base md:text-lg font-bold text-pink-400 mb-3">🏆 Достижения</h3>
+                    <div class="glass-premium rounded-xl p-4">
+                        <h3 class="text-lg md:text-xl font-bold text-pink-400 mb-3">🏆 Достижения</h3>
                         <div id="achievements-list" class="grid grid-cols-1 md:grid-cols-2 gap-2"></div>
+                    </div>
+                </div>
+
+                <div id="content-minigame" class="tab-content hidden">
+                    <div class="glass-premium rounded-xl p-4">
+                        <h3 class="text-lg md:text-xl font-bold text-cyan-400 mb-3">🎮 Поймай беляш!</h3>
+                        <p class="text-xs text-gray-400 mb-3">Кликай на беляши чтобы заработать бонусные рубли!</p>
+                        <div id="minigame-area" class="relative h-64 bg-gray-800/50 rounded-xl overflow-hidden cursor-pointer">
+                            <div class="absolute inset-0 flex items-center justify-center text-gray-500">
+                                Нажми "Старт" чтобы начать
+                            </div>
+                        </div>
+                        <button onclick="startMinigame()" id="minigame-start-btn" class="w-full mt-3 bg-gradient-to-r from-cyan-500 to-blue-500 text-white font-bold py-3 rounded-xl">
+                             Старт
+                        </button>
+                        <div class="text-center mt-2 text-sm">
+                            Поймано: <span id="minigame-score" class="text-yellow-400 font-bold">0</span> | 
+                            Время: <span id="minigame-time" class="text-red-400 font-bold">30</span>с
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Sidebar -->
             <div class="space-y-3 md:space-y-4">
-                <div class="glass rounded-xl p-3 md:p-4">
-                    <h3 class="text-base md:text-lg font-bold text-green-400 mb-2">📋 Журнал</h3>
-                    <div id="event-log" class="space-y-1 max-h-48 md:max-h-64 overflow-y-auto text-xs">
-                        <div class="text-gray-400 italic">Игра началась! Кликай, завхоз!</div>
-                    </div>
+                <div class="glass-premium rounded-xl p-4">
+                    <h3 class="text-lg font-bold text-green-400 mb-2">📋 Журнал</h3>
+                    <div id="event-log" class="space-y-1 max-h-48 overflow-y-auto text-xs"></div>
                 </div>
 
-                <div class="glass rounded-xl p-3 md:p-4">
-                    <h3 class="text-base md:text-lg font-bold text-purple-400 mb-2">📊 Статистика</h3>
-                    <div class="space-y-1 text-xs md:text-sm">
+                <div class="glass-premium rounded-xl p-4">
+                    <h3 class="text-lg font-bold text-purple-400 mb-2">📊 Статистика</h3>
+                    <div class="space-y-1 text-xs">
                         <div class="flex justify-between"><span class="text-gray-400">Кликов:</span><span id="total-clicks" class="text-yellow-400">0</span></div>
                         <div class="flex justify-between"><span class="text-gray-400">Критов:</span><span id="total-crits" class="text-red-400">0</span></div>
                         <div class="flex justify-between"><span class="text-gray-400">Миссий:</span><span id="completed-missions" class="text-green-400">0/25</span></div>
@@ -301,53 +417,87 @@
                     </div>
                 </div>
 
-                <div class="glass rounded-xl p-3 md:p-4 text-center">
-                    <div class="text-4xl mb-2">🐱</div>
+                <div class="glass-premium rounded-xl p-4 text-center">
+                    <div class="text-5xl mb-2 cat-bounce">🐱</div>
                     <div class="text-sm font-bold text-yellow-400">Кот Барсик</div>
-                    <div class="text-xs text-gray-400">Моральная опора завхоза</div>
+                    <div class="text-xs text-gray-400">Моральная опора</div>
                     <div class="text-xs text-purple-400 mt-1">Настроение: <span id="cat-mood">100</span>%</div>
+                    <button onclick="petCat()" class="mt-2 bg-purple-500/30 rounded-lg px-3 py-1 text-xs hover:bg-purple-500/50">
+                        🐱 Погладить
+                    </button>
+                </div>
+
+                <div class="glass-premium rounded-xl p-4">
+                    <h3 class="text-lg font-bold text-cyan-400 mb-2"> Лотерея</h3>
+                    <p class="text-xs text-gray-400 mb-2">Испытай удачу за 100₽!</p>
+                    <button onclick="playLottery()" class="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-2 rounded-xl">
+                        🎰 Крутить (100₽)
+                    </button>
                 </div>
             </div>
         </div>
 
         <footer class="text-center mt-6 text-gray-500 text-xs">
             <p>© 2026 ГБУ ЯНАО ЦСОН «Гармония»</p>
-            <p class="text-yellow-400/60 mt-1">Специально для Алиева Аладдина Балдадашевича</p>
+            <p class="text-yellow-400/60 mt-1">✨ Специально для Алиева Аладдина Балдадашевича ✨</p>
         </footer>
     </div>
 
-    <!-- Mission Modal -->
+    <!-- Modals -->
     <div id="mission-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden p-4">
-        <div class="glass rounded-2xl p-6 md:p-8 max-w-md w-full text-center modal">
-            <div id="mission-modal-icon" class="text-5xl md:text-6xl mb-3">🎉</div>
-            <h3 class="text-xl md:text-2xl font-bold text-yellow-400 mb-2">Миссия выполнена!</h3>
-            <p id="mission-modal-text" class="text-gray-300 mb-3 text-sm md:text-base">Описание</p>
-            <div id="mission-modal-reward" class="text-lg font-bold text-green-400 mb-4">+100₽</div>
-            <button onclick="closeMissionModal()" class="bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold py-2 md:py-3 px-6 md:px-8 rounded-xl">Продолжить</button>
+        <div class="glass-premium rounded-2xl p-6 md:p-8 max-w-md w-full text-center modal">
+            <div id="mission-modal-icon" class="text-6xl mb-3">🎉</div>
+            <h3 class="text-2xl font-bold text-yellow-400 mb-2 neon-text">МИССИЯ ВЫПОЛНЕНА!</h3>
+            <p id="mission-modal-text" class="text-gray-300 mb-3">Описание</p>
+            <div id="mission-modal-reward" class="text-xl font-bold text-green-400 mb-4">+100₽</div>
+            <button onclick="closeMissionModal()" class="bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold py-3 px-8 rounded-xl">Продолжить</button>
         </div>
     </div>
 
-    <!-- Event Modal -->
     <div id="event-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden p-4">
-        <div class="glass rounded-2xl p-6 md:p-8 max-w-md w-full text-center modal">
-            <div id="event-modal-icon" class="text-5xl md:text-6xl mb-3">⚠️</div>
-            <h3 id="event-modal-title" class="text-xl md:text-2xl font-bold text-yellow-400 mb-2">Событие!</h3>
-            <p id="event-modal-text" class="text-gray-300 mb-4 text-sm md:text-base">Текст</p>
+        <div class="glass-premium rounded-2xl p-6 md:p-8 max-w-md w-full text-center modal">
+            <div id="event-modal-icon" class="text-6xl mb-3">⚠️</div>
+            <h3 id="event-modal-title" class="text-2xl font-bold text-yellow-400 mb-2">Событие!</h3>
+            <p id="event-modal-text" class="text-gray-300 mb-4">Текст</p>
             <div id="event-modal-choices" class="space-y-2"></div>
+        </div>
+    </div>
+
+    <div id="achievement-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden p-4">
+        <div class="glass-premium rounded-2xl p-6 md:p-8 max-w-md w-full text-center modal achievement-unlock">
+            <div class="text-6xl mb-3">🏆</div>
+            <h3 class="text-2xl font-bold text-yellow-400 mb-2 neon-text">ДОСТИЖЕНИЕ!</h3>
+            <div id="achievement-name" class="text-xl font-bold text-purple-400 mb-2">Название</div>
+            <p id="achievement-desc" class="text-gray-300 mb-4">Описание</p>
+            <button onclick="closeAchievementModal()" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 px-8 rounded-xl">Круто!</button>
         </div>
     </div>
 
     <script>
         // Prevent zoom
         let lastTouchEnd = 0;
-        document.addEventListener('touchend', function(e) {
+        document.addEventListener('touchend', e => {
             const now = Date.now();
             if (now - lastTouchEnd <= 300) e.preventDefault();
             lastTouchEnd = now;
         }, { passive: false });
         document.addEventListener('dblclick', e => e.preventDefault(), { passive: false });
-        document.addEventListener('gesturestart', e => e.preventDefault());
-        document.addEventListener('touchmove', e => { if (e.touches.length > 1) e.preventDefault(); }, { passive: false });
+
+        // Create animated background
+        function createStars() {
+            const bg = document.getElementById('bg-animation');
+            for (let i = 0; i < 50; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                bg.appendChild(star);
+            }
+        }
+        createStars();
 
         // Game State
         const state = {
@@ -370,96 +520,15 @@
             streakActive: false,
             catMood: 100,
             inventory: {},
-            upgrades: { power: 0, crit: 0, combo: 0, auto: 0 }
+            level: 1,
+            levelProgress: 0,
+            levelRequired: 100,
+            upgrades: { power: 0, crit: 0, combo: 0, auto: 0 },
+            minigameActive: false,
+            minigameScore: 0
         };
 
-        const MISSIONS = [
-            { id: 'm1', title: 'Первый клик', desc: 'Сделай 1 клик', target: 1, type: 'clicks', reward: 10, icon: '👶' },
-            { id: 'm2', title: 'Разминка', desc: 'Сделай 10 кликов', target: 10, type: 'clicks', reward: 25, icon: '🏃' },
-            { id: 'm3', title: 'Чайная пауза', desc: 'Накопи 50₽', target: 50, type: 'rubles', reward: 30, icon: '' },
-            { id: 'm4', title: 'Активный завхоз', desc: 'Сделай 50 кликов', target: 50, type: 'clicks', reward: 60, icon: '💪' },
-            { id: 'm5', title: 'Первая покупка', desc: 'Купи любой товар', target: 1, type: 'purchases', reward: 80, icon: '🛒' },
-            { id: 'm6', title: 'Накопи 200₽', desc: 'Заработай 200₽', target: 200, type: 'rubles', reward: 100, icon: '💵' },
-            { id: 'm7', title: 'Сотня кликов', desc: 'Сделай 100 кликов', target: 100, type: 'clicks', reward: 150, icon: '🎯' },
-            { id: 'm8', title: 'Критический удар', desc: 'Сделай 1 крит', target: 1, type: 'crits', reward: 100, icon: '💥' },
-            { id: 'm9', title: 'Чайный запас', desc: 'Купи 3 чая', target: 3, type: 'item_tea', reward: 150, icon: '🍵' },
-            { id: 'm10', title: 'Накопи 500₽', desc: 'Заработай 500₽', target: 500, type: 'rubles', reward: 250, icon: '💎' },
-            { id: 'm11', title: 'Комбо мастер', desc: 'Достигни комбо x5', target: 5, type: 'combo', reward: 200, icon: '🔥' },
-            { id: 'm12', title: 'Гранатовый барон', desc: 'Купи 2 гранатовых сока', target: 2, type: 'item_pomegranate', reward: 200, icon: '🧃' },
-            { id: 'm13', title: 'Первая прокачка', desc: 'Купи прокачку', target: 1, type: 'upgrades', reward: 150, icon: '⚡' },
-            { id: 'm14', title: 'Марафон', desc: 'Сделай 500 кликов', target: 500, type: 'clicks', reward: 350, icon: '🏆' },
-            { id: 'm15', title: 'Беляш-пати', desc: 'Купи 5 беляшей', target: 5, type: 'item_belyashi', reward: 250, icon: '🥟' },
-            { id: 'm16', title: 'Накопи 1000₽', desc: 'Заработай 1000₽', target: 1000, type: 'rubles', reward: 500, icon: '👑' },
-            { id: 'm17', title: 'Кот Барсик', desc: 'Купи кота', target: 1, type: 'item_cat', reward: 400, icon: '' },
-            { id: 'm18', title: 'Автономность', desc: 'Купи 3 авто-кликера', target: 3, type: 'auto_level', reward: 400, icon: '🤖' },
-            { id: 'm19', title: 'Комбо легенда', desc: 'Достигни комбо x10', target: 10, type: 'combo', reward: 500, icon: '⚡' },
-            { id: 'm20', title: 'Швабра золота', desc: 'Купи золотую швабру', target: 1, type: 'item_mop', reward: 500, icon: '🧹' },
-            { id: 'm21', title: 'Тысяча кликов', desc: 'Сделай 1000 кликов', target: 1000, type: 'clicks', reward: 800, icon: '🌟' },
-            { id: 'm22', title: 'Кофеман', desc: 'Купи кофемашину', target: 1, type: 'item_coffee', reward: 600, icon: '☕' },
-            { id: 'm23', title: 'Накопи 3000₽', desc: 'Заработай 3000₽', target: 3000, type: 'rubles', reward: 1000, icon: '💰' },
-            { id: 'm24', title: 'Диван в кабинет', desc: 'Купи диван', target: 1, type: 'item_sofa', reward: 800, icon: '🛋️' },
-            { id: 'm25', title: 'Лучший завхоз ЯНАО', desc: 'Заработай 5000₽', target: 5000, type: 'rubles', reward: 2500, icon: '' }
-        ];
-
-        const SHOP = [
-            { id: 'tea', name: '🍵 Чай "Гармония"', desc: 'Горный, с чабрецом. Бонус +10₽', cost: 30, effect: () => { state.rubles += 10; }, consumable: true },
-            { id: 'pomegranate', name: ' Гранатовый сок', desc: 'Премиум напиток директора. +25₽', cost: 75, effect: () => { state.rubles += 25; }, consumable: true },
-            { id: 'belyashi', name: '🥟 Беляши', desc: 'Из буфета. +15₽ и настроение', cost: 40, effect: () => { state.rubles += 15; state.catMood = Math.min(100, state.catMood + 10); }, consumable: true },
-            { id: 'toilet_paper', name: '🧻 Туалетная бумага', desc: 'Расходник №1. +5₽', cost: 15, effect: () => { state.rubles += 5; }, consumable: true },
-            { id: 'cleaning', name: '🧴 Моющее средство', desc: 'Для отчёта. +20₽', cost: 60, effect: () => { state.rubles += 20; }, consumable: true },
-            { id: 'cat', name: '🐱 Кот Барсик', desc: 'Моральная опора. +1₽/сек', cost: 300, effect: () => { state.autoClickPower += 1; }, oneTime: true },
-            { id: 'mop', name: '🧹 Золотая швабра', desc: 'Символ власти. +3₽/сек', cost: 800, effect: () => { state.autoClickPower += 3; }, oneTime: true },
-            { id: 'coffee', name: '☕ Кофемашина', desc: 'Для бухгалтерии. +5₽/сек', cost: 1500, effect: () => { state.autoClickPower += 5; }, oneTime: true },
-            { id: 'sofa', name: '🛋️ Диван в кабинет', desc: 'Для отдыха. +10₽/сек', cost: 3000, effect: () => { state.autoClickPower += 10; }, oneTime: true },
-            { id: 'seal', name: '🔖 Золотая печать', desc: 'Для ведомостей. +20₽/сек', cost: 6000, effect: () => { state.autoClickPower += 20; }, oneTime: true }
-        ];
-
-        const UPGRADES = [
-            { id: 'power1', name: '💪 Сила +1', desc: '+1₽ за клик', cost: 50, effect: () => { state.clickPower += 1; state.upgrades.power++; }, maxLevel: 100, currentLevel: 0 },
-            { id: 'power2', name: '💪 Сила +5', desc: '+5₽ за клик', cost: 200, effect: () => { state.clickPower += 5; state.upgrades.power++; }, maxLevel: 50, currentLevel: 0 },
-            { id: 'crit1', name: '🎯 Крит +5%', desc: 'Шанс крита', cost: 100, effect: () => { state.critChance += 5; state.upgrades.crit++; }, maxLevel: 10, currentLevel: 0 },
-            { id: 'crit2', name: '💥 Крит x1', desc: 'Множитель крита', cost: 300, effect: () => { state.critMulti += 1; state.upgrades.crit++; }, maxLevel: 10, currentLevel: 0 },
-            { id: 'combo1', name: ' Комбо +1с', desc: 'Время комбо', cost: 150, effect: () => { state.upgrades.combo++; }, maxLevel: 10, currentLevel: 0 },
-            { id: 'auto1', name: '🤖 Авто-клик', desc: '+1₽/сек', cost: 100, effect: () => { state.autoClickPower += 1; state.upgrades.auto++; }, maxLevel: 50, currentLevel: 0 }
-        ];
-
-        const ACHIEVEMENTS = [
-            { id: 'a1', name: '👶 Первый клик', desc: 'Сделай первый клик', check: () => state.totalClicks >= 1 },
-            { id: 'a2', name: '🔥 Комбо x5', desc: 'Достигни комбо x5', check: () => state.combo >= 5 },
-            { id: 'a3', name: '💥 Крит', desc: 'Сделай крит', check: () => state.totalCrits >= 1 },
-            { id: 'a4', name: '💰 100₽', desc: 'Заработай 100₽', check: () => state.rubles >= 100 },
-            { id: 'a5', name: '💎 1000₽', desc: 'Заработай 1000₽', check: () => state.rubles >= 1000 },
-            { id: 'a6', name: ' Сила 10', desc: 'Сила клика 10', check: () => state.clickPower >= 10 },
-            { id: 'a7', name: '🐱 Котовладелец', desc: 'Купи кота', check: () => (state.inventory.cat || 0) >= 1 },
-            { id: 'a8', name: ' 5 миссий', desc: 'Выполни 5 миссий', check: () => state.completedMissions.size >= 5 },
-            { id: 'a9', name: '🏆 Легенда', desc: '1000 кликов', check: () => state.totalClicks >= 1000 },
-            { id: 'a10', name: '👑 Мастер', desc: 'Все миссии', check: () => state.completedMissions.size >= MISSIONS.length },
-            { id: 'a11', name: '🍵 Чайник', desc: 'Купи 5 чаёв', check: () => (state.inventory.tea || 0) >= 5 },
-            { id: 'a12', name: '🧃 Гранатовый', desc: 'Купи 5 соков', check: () => (state.inventory.pomegranate || 0) >= 5 }
-        ];
-
-        const RANDOM_EVENTS = [
-            { icon: '', title: 'Барсик уронил чашку!', text: 'Кот скинул вашу любимую чашку со стола. Настроение кота упало.', choices: [
-                { text: '🐱 Погладить кота (-20₽)', effect: () => { if (state.rubles >= 20) { state.rubles -= 20; state.catMood = Math.min(100, state.catMood + 20); logEvent(' Барсик доволен!', 'purple'); } else { logEvent('❌ Не хватает денег!', 'red'); } } },
-                { text: '😤 Ругаться', effect: () => { state.catMood = Math.max(0, state.catMood - 20); logEvent('Барсик обиделся', 'red'); } }
-            ]},
-            { icon: '👔', title: 'Проверка из министерства!', text: 'Приехала проверка! Нужно показать склад в порядке.', choices: [
-                { text: '🧹 Убрать всё (Энергия)', effect: () => { state.rubles += 50; logEvent('✅ Проверка пройдена! +50₽', 'green'); } },
-                { text: ' Спрятаться', effect: () => { state.rubles = Math.max(0, state.rubles - 30); logEvent(' Нашли! Штраф -30₽', 'red'); } }
-            ]},
-            { icon: '💧', title: 'Прорвало трубу!', text: 'В туалете потоп! Сантехник в отпуске.', choices: [
-                { text: '🪣 Поставить ведро', effect: () => { logEvent('Временно решили', 'yellow'); } },
-                { text: '📞 Вызвать сантехника (-100₽)', effect: () => { if (state.rubles >= 100) { state.rubles -= 100; state.rubles += 150; logEvent('✅ Починили! +150₽', 'green'); } else { logEvent('❌ Нет денег!', 'red'); } } }
-            ]},
-            { icon: '🍵', title: 'Чай закончился!', text: 'В буфете нет чая! Сотрудники в панике!', choices: [
-                { text: '🏃 Бежать за чаем (-50₽)', effect: () => { if (state.rubles >= 50) { state.rubles -= 50; state.rubles += 100; logEvent(' Чай куплен! +100₽', 'blue'); } else { state.rubles = Math.max(0, state.rubles - 20); logEvent('❌ Бунт! -20₽', 'red'); } } }
-            ]},
-            { icon: '🎉', title: 'День рождения коллеги!', text: 'Скидываемся на подарок!', choices: [
-                { text: '💰 Скинуться 50₽', effect: () => { if (state.rubles >= 50) { state.rubles -= 50; state.rubles += 120; logEvent('🎁 Подарок куплен! +120₽', 'green'); } else { logEvent('❌ пожадина!', 'red'); } } },
-                { text: '🙈 Сделать вид что не заметил', effect: () => { logEvent('Коллеги обиделись', 'gray'); } }
-            ]}
-        ];
-
+        const RANKS = ['Стажёр', 'Помощник', 'Специалист', 'Мастер', 'Эксперт', 'Легенда', 'Босс'];
         const JOKES = [
             '"Пока директор в отпуске — я тут главный!"',
             '"Барсик — мой зам по моральным вопросам"',
@@ -469,22 +538,95 @@
             '"Кто не рискует — тот не пьёт чай в кабинете"',
             '"Швабра — продолжение руки завхоза"',
             '"Беляши решают всё"',
-            '"Диван в кабинете — это не роскошь, а необходимость"',
-            '"1000 кликов — и ты легенда ЯНАО"'
+            '"Диван в кабинете — это не роскошь"',
+            '"1000 кликов — и ты легенда ЯНАО"',
+            '"Кот Барсик одобряет этот клик"',
+            '"Ещё один клик — и я куплю себе яхту"',
+            '"Завхоз не спит — завхоз копит"',
+            '"Кликни сильнее, беляш сам себя не купит"'
         ];
 
-        // DOM
+        const MISSIONS = [
+            { id: 'm1', title: 'Первый клик', desc: 'Сделай 1 клик', target: 1, type: 'clicks', reward: 10, icon: '👶' },
+            { id: 'm2', title: 'Разминка', desc: 'Сделай 10 кликов', target: 10, type: 'clicks', reward: 25, icon: '' },
+            { id: 'm3', title: 'Чайная пауза', desc: 'Накопи 50₽', target: 50, type: 'rubles', reward: 30, icon: '🍵' },
+            { id: 'm4', title: 'Активный завхоз', desc: 'Сделай 50 кликов', target: 50, type: 'clicks', reward: 60, icon: '💪' },
+            { id: 'm5', title: 'Первая покупка', desc: 'Купи любой товар', target: 1, type: 'purchases', reward: 80, icon: '🛒' },
+            { id: 'm6', title: 'Накопи 200₽', desc: 'Заработай 200₽', target: 200, type: 'rubles', reward: 100, icon: '💵' },
+            { id: 'm7', title: 'Сотня кликов', desc: 'Сделай 100 кликов', target: 100, type: 'clicks', reward: 150, icon: '🎯' },
+            { id: 'm8', title: 'Критический удар', desc: 'Сделай 1 крит', target: 1, type: 'crits', reward: 100, icon: '' },
+            { id: 'm9', title: 'Чайный запас', desc: 'Купи 3 чая', target: 3, type: 'item_tea', reward: 150, icon: '🍵' },
+            { id: 'm10', title: 'Накопи 500₽', desc: 'Заработай 500₽', target: 500, type: 'rubles', reward: 250, icon: '💎' },
+            { id: 'm11', title: 'Комбо мастер', desc: 'Достигни комбо x5', target: 5, type: 'combo', reward: 200, icon: '🔥' },
+            { id: 'm12', title: 'Гранатовый барон', desc: 'Купи 2 гранатовых сока', target: 2, type: 'item_pomegranate', reward: 200, icon: '🧃' },
+            { id: 'm13', title: 'Первая прокачка', desc: 'Купи прокачку', target: 1, type: 'upgrades', reward: 150, icon: '⚡' },
+            { id: 'm14', title: 'Марафон', desc: 'Сделай 500 кликов', target: 500, type: 'clicks', reward: 350, icon: '🏆' },
+            { id: 'm15', title: 'Беляш-пати', desc: 'Купи 5 беляшей', target: 5, type: 'item_belyashi', reward: 250, icon: '🥟' },
+            { id: 'm16', title: 'Накопи 1000₽', desc: 'Заработай 1000₽', target: 1000, type: 'rubles', reward: 500, icon: '' },
+            { id: 'm17', title: 'Кот Барсик', desc: 'Купи кота', target: 1, type: 'item_cat', reward: 400, icon: '🐱' },
+            { id: 'm18', title: 'Автономность', desc: 'Купи 3 авто-кликера', target: 3, type: 'auto_level', reward: 400, icon: '🤖' },
+            { id: 'm19', title: 'Комбо легенда', desc: 'Достигни комбо x10', target: 10, type: 'combo', reward: 500, icon: '⚡' },
+            { id: 'm20', title: 'Швабра золота', desc: 'Купи золотую швабру', target: 1, type: 'item_mop', reward: 500, icon: '🧹' },
+            { id: 'm21', title: 'Тысяча кликов', desc: 'Сделай 1000 кликов', target: 1000, type: 'clicks', reward: 800, icon: '' },
+            { id: 'm22', title: 'Кофеман', desc: 'Купи кофемашину', target: 1, type: 'item_coffee', reward: 600, icon: '☕' },
+            { id: 'm23', title: 'Накопи 3000₽', desc: 'Заработай 3000₽', target: 3000, type: 'rubles', reward: 1000, icon: '💰' },
+            { id: 'm24', title: 'Диван в кабинет', desc: 'Купи диван', target: 1, type: 'item_sofa', reward: 800, icon: '️' },
+            { id: 'm25', title: 'Лучший завхоз ЯНАО', desc: 'Заработай 5000₽', target: 5000, type: 'rubles', reward: 2500, icon: '🏅' }
+        ];
+
+        const SHOP = [
+            { id: 'tea', name: '🍵 Чай "Гармония"', desc: 'Горный, с чабрецом. +10₽', cost: 30, effect: () => { state.rubles += 10; }, consumable: true },
+            { id: 'pomegranate', name: '🧃 Гранатовый сок', desc: 'Премиум напиток. +25₽', cost: 75, effect: () => { state.rubles += 25; }, consumable: true },
+            { id: 'belyashi', name: '🥟 Беляши', desc: 'Из буфета. +15₽', cost: 40, effect: () => { state.rubles += 15; state.catMood = Math.min(100, state.catMood + 10); }, consumable: true },
+            { id: 'toilet_paper', name: '🧻 Туалетная бумага', desc: 'Расходник №1. +5₽', cost: 15, effect: () => { state.rubles += 5; }, consumable: true },
+            { id: 'cleaning', name: '🧴 Моющее средство', desc: 'Для отчёта. +20₽', cost: 60, effect: () => { state.rubles += 20; }, consumable: true },
+            { id: 'cat', name: '🐱 Кот Барсик', desc: 'Моральная опора. +1₽/сек', cost: 300, effect: () => { state.autoClickPower += 1; }, oneTime: true },
+            { id: 'mop', name: '🧹 Золотая швабра', desc: 'Символ власти. +3₽/сек', cost: 800, effect: () => { state.autoClickPower += 3; }, oneTime: true },
+            { id: 'coffee', name: '☕ Кофемашина', desc: 'Для бухгалтерии. +5₽/сек', cost: 1500, effect: () => { state.autoClickPower += 5; }, oneTime: true },
+            { id: 'sofa', name: '🛋️ Диван', desc: 'Для отдыха. +10₽/сек', cost: 3000, effect: () => { state.autoClickPower += 10; }, oneTime: true },
+            { id: 'seal', name: '🔖 Золотая печать', desc: 'Для ведомостей. +20₽/сек', cost: 6000, effect: () => { state.autoClickPower += 20; }, oneTime: true }
+        ];
+
+        const UPGRADES = [
+            { id: 'power1', name: '💪 Сила +1', desc: '+1₽ за клик', cost: 50, effect: () => { state.clickPower += 1; state.upgrades.power++; }, maxLevel: 100, currentLevel: 0 },
+            { id: 'power2', name: '💪 Сила +5', desc: '+5₽ за клик', cost: 200, effect: () => { state.clickPower += 5; state.upgrades.power++; }, maxLevel: 50, currentLevel: 0 },
+            { id: 'crit1', name: '🎯 Крит +5%', desc: 'Шанс крита', cost: 100, effect: () => { state.critChance += 5; state.upgrades.crit++; }, maxLevel: 10, currentLevel: 0 },
+            { id: 'crit2', name: '💥 Крит x1', desc: 'Множитель крита', cost: 300, effect: () => { state.critMulti += 1; state.upgrades.crit++; }, maxLevel: 10, currentLevel: 0 },
+            { id: 'combo1', name: '🔥 Комбо +1с', desc: 'Время комбо', cost: 150, effect: () => { state.upgrades.combo++; }, maxLevel: 10, currentLevel: 0 },
+            { id: 'auto1', name: '🤖 Авто-клик', desc: '+1₽/сек', cost: 100, effect: () => { state.autoClickPower += 1; state.upgrades.auto++; }, maxLevel: 50, currentLevel: 0 }
+        ];
+
+        const ACHIEVEMENTS = [
+            { id: 'a1', name: '👶 Первый клик', desc: 'Сделай первый клик', rarity: 'common', check: () => state.totalClicks >= 1 },
+            { id: 'a2', name: '🔥 Комбо x5', desc: 'Достигни комбо x5', rarity: 'rare', check: () => state.combo >= 5 },
+            { id: 'a3', name: '💥 Крит', desc: 'Сделай крит', rarity: 'rare', check: () => state.totalCrits >= 1 },
+            { id: 'a4', name: '💰 100₽', desc: 'Заработай 100₽', rarity: 'common', check: () => state.rubles >= 100 },
+            { id: 'a5', name: '💎 1000₽', desc: 'Заработай 1000₽', rarity: 'epic', check: () => state.rubles >= 1000 },
+            { id: 'a6', name: '💪 Сила 10', desc: 'Сила клика 10', rarity: 'rare', check: () => state.clickPower >= 10 },
+            { id: 'a7', name: '🐱 Котовладелец', desc: 'Купи кота', rarity: 'epic', check: () => (state.inventory.cat || 0) >= 1 },
+            { id: 'a8', name: ' 5 миссий', desc: 'Выполни 5 миссий', rarity: 'rare', check: () => state.completedMissions.size >= 5 },
+            { id: 'a9', name: '🏆 Легенда', desc: '1000 кликов', rarity: 'epic', check: () => state.totalClicks >= 1000 },
+            { id: 'a10', name: '👑 Мастер', desc: 'Все миссии', rarity: 'legendary', check: () => state.completedMissions.size >= MISSIONS.length },
+            { id: 'a11', name: '🍵 Чайник', desc: 'Купи 5 чаёв', rarity: 'rare', check: () => (state.inventory.tea || 0) >= 5 },
+            { id: 'a12', name: '🧃 Гранатовый', desc: 'Купи 5 соков', rarity: 'epic', check: () => (state.inventory.pomegranate || 0) >= 5 }
+        ];
+
+        const RANDOM_EVENTS = [
+            { icon: '', title: 'Барсик уронил чашку!', text: 'Кот скинул вашу любимую чашку!', choices: [
+                { text: '🐱 Погладить (-20₽)', effect: () => { if (state.rubles >= 20) { state.rubles -= 20; state.catMood = Math.min(100, state.catMood + 20); logEvent('Барсик доволен!', 'purple'); } else logEvent('❌ Не хватает!', 'red'); } },
+                { text: '😤 Ругаться', effect: () => { state.catMood = Math.max(0, state.catMood - 20); logEvent('Барсик обиделся', 'red'); } }
+            ]},
+            { icon: '👔', title: 'Проверка!', text: 'Приехала проверка из министерства!', choices: [
+                { text: '🧹 Убрать всё', effect: () => { state.rubles += 50; logEvent('✅ Проверка пройдена! +50₽', 'green'); } },
+                { text: '🙈 Спрятаться', effect: () => { state.rubles = Math.max(0, state.rubles - 30); logEvent('Нашли! -30₽', 'red'); } }
+            ]},
+            { icon: '💧', title: 'Прорвало трубу!', text: 'В туалете потоп!', choices: [
+                { text: '🪣 Поставить ведро', effect: () => { logEvent('Временно решили', 'yellow'); } },
+                { text: '📞 Сантехник (-100₽)', effect: () => { if (state.rubles >= 100) { state.rubles -= 100; state.rubles += 150; logEvent('✅ Починили! +150₽', 'green'); } else logEvent(' Нет денег!', 'red'); } }
+            ]}
+        ];
+
         const $ = id => document.getElementById(id);
-        const elRubles = $('stat-rubles'), elPower = $('stat-power'), elMission = $('stat-mission'), elCombo = $('stat-combo');
-        const elClickValue = $('click-value'), elComboDisplay = $('combo-display'), elComboMultiplier = $('combo-multiplier');
-        const elCurrentMissionDisplay = $('current-mission-display'), elCurrentMissionBar = $('current-mission-bar');
-        const elCurrentMissionProgress = $('current-mission-progress'), elCurrentMissionTarget = $('current-mission-target');
-        const elMissionsList = $('missions-list'), elShopList = $('shop-list'), elUpgradesList = $('upgrades-list');
-        const elInventoryList = $('inventory-list'), elAchievementsList = $('achievements-list');
-        const elLog = $('event-log'), elTotalClicks = $('total-clicks'), elTotalCrits = $('total-crits');
-        const elCompletedMissions = $('completed-missions'), elAutoPerSec = $('auto-per-sec'), elTotalBonuses = $('total-bonuses');
-        const elStreakContainer = $('streak-container'), elStreakTimer = $('streak-timer'), elStreakBar = $('streak-bar');
-        const elBtnEmoji = $('btn-emoji'), elCatMood = $('cat-mood');
 
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -527,13 +669,23 @@
 
             state.rubles += clickValue;
             state.totalClicks++;
+            state.levelProgress++;
+
+            if (state.levelProgress >= state.levelRequired) {
+                state.level++;
+                state.levelProgress = 0;
+                state.levelRequired = Math.floor(state.levelRequired * 1.5);
+                logEvent('⭐ Уровень ' + state.level + '! Ранг: ' + RANKS[Math.min(RANKS.length - 1, Math.floor((state.level - 1) / 5))], 'yellow');
+                $('main-click-btn').classList.add('level-up');
+                setTimeout(() => $('main-click-btn').classList.remove('level-up'), 1000);
+            }
 
             if (Math.random() < 0.03) spawnBonusCoin();
 
             const rect = e.currentTarget.getBoundingClientRect();
             const x = e.clientX || (rect.left + rect.width / 2);
             const y = e.clientY || (rect.top + rect.height / 2);
-            spawnParticle(x, y, '+' + Math.floor(clickValue) + '₽', isCrit ? '#ff0000' : '#facc15', isCrit);
+            spawnParticle(x, y, '+' + Math.floor(clickValue) + '₽', isCrit ? '#ff0000' : '#ffd700', isCrit);
             
             if (isCrit) {
                 $('main-click-btn').classList.add('shake');
@@ -547,20 +699,20 @@
 
         function activateStreak() {
             state.streakActive = true;
-            elStreakContainer.classList.remove('hidden');
+            $('streak-container').classList.remove('hidden');
             logEvent('⚡ СТРИК! x2 на 10с!', 'yellow');
             let timeLeft = 10;
-            elStreakTimer.textContent = timeLeft + 'с';
-            elStreakBar.style.width = '100%';
+            $('streak-timer').textContent = timeLeft + 'с';
+            $('streak-bar').style.width = '100%';
             state.streakTimer = setInterval(() => {
                 timeLeft--;
-                elStreakTimer.textContent = timeLeft + 'с';
-                elStreakBar.style.width = (timeLeft / 10 * 100) + '%';
+                $('streak-timer').textContent = timeLeft + 'с';
+                $('streak-bar').style.width = (timeLeft / 10 * 100) + '%';
                 if (timeLeft <= 0) {
                     clearInterval(state.streakTimer);
                     state.streakActive = false;
                     state.streak = 0;
-                    elStreakContainer.classList.add('hidden');
+                    $('streak-container').classList.add('hidden');
                     logEvent('Стрик закончился', 'gray');
                     updateUI();
                 }
@@ -592,6 +744,19 @@
             setTimeout(() => el.remove(), 1000);
         }
 
+        function createConfetti() {
+            for (let i = 0; i < 30; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.top = '-10px';
+                confetti.style.backgroundColor = ['#ffd700', '#ff8c00', '#ff4500', '#00ff00', '#00ffff'][Math.floor(Math.random() * 5)];
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                document.body.appendChild(confetti);
+                setTimeout(() => confetti.remove(), 3000);
+            }
+        }
+
         function getMissionProgress(m) {
             if (m.type === 'clicks') return state.totalClicks;
             if (m.type === 'rubles') return state.rubles;
@@ -599,13 +764,8 @@
             if (m.type === 'combo') return state.combo;
             if (m.type === 'auto_level') return state.upgrades.auto;
             if (m.type === 'upgrades') return state.upgrades.power + state.upgrades.crit + state.upgrades.combo + state.upgrades.auto;
-            if (m.type === 'purchases') {
-                return Object.values(state.inventory).reduce((a, b) => a + b, 0);
-            }
-            if (m.type.startsWith('item_')) {
-                const itemId = m.type.replace('item_', '');
-                return state.inventory[itemId] || 0;
-            }
+            if (m.type === 'purchases') return Object.values(state.inventory).reduce((a, b) => a + b, 0);
+            if (m.type.startsWith('item_')) return state.inventory[m.type.replace('item_', '')] || 0;
             return 0;
         }
 
@@ -617,22 +777,18 @@
                 state.rubles += m.reward;
                 state.currentMissionIndex++;
                 showMissionModal(m);
+                createConfetti();
                 logEvent('✅ ' + m.title + '! +' + m.reward + '₽', 'green');
-                updateButtonEmoji();
             }
-        }
-
-        function updateButtonEmoji() {
-            const emojis = ['💰', '💵', '', '🏆', '', '⚡', '', '🏅'];
-            const idx = Math.min(emojis.length - 1, Math.floor(state.currentMissionIndex / 3));
-            elBtnEmoji.textContent = emojis[idx];
         }
 
         function checkAchievements() {
             ACHIEVEMENTS.forEach(a => {
                 if (!state.achievements.has(a.id) && a.check()) {
                     state.achievements.add(a.id);
-                    logEvent('🎖️ ' + a.name, 'yellow');
+                    showAchievementModal(a);
+                    createConfetti();
+                    logEvent('🏆 ' + a.name, 'yellow');
                 }
             });
         }
@@ -645,15 +801,22 @@
         }
         function closeMissionModal() { $('mission-modal').classList.add('hidden'); updateUI(); }
 
+        function showAchievementModal(a) {
+            $('achievement-name').textContent = a.name;
+            $('achievement-desc').textContent = a.desc;
+            $('achievement-modal').classList.remove('hidden');
+        }
+        function closeAchievementModal() { $('achievement-modal').classList.add('hidden'); }
+
         function buyShopItem(itemId) {
             const item = SHOP.find(i => i.id === itemId);
-            if (!item || state.rubles < item.cost) { logEvent(' Не хватает денег!', 'red'); return; }
-            if (item.oneTime && (state.inventory[itemId] || 0) >= 1) { logEvent('❌ Уже куплено!', 'red'); return; }
+            if (!item || state.rubles < item.cost) { logEvent('❌ Не хватает!', 'red'); return; }
+            if (item.oneTime && (state.inventory[itemId] || 0) >= 1) { logEvent('❌ Уже есть!', 'red'); return; }
             
             state.rubles -= item.cost;
             state.inventory[itemId] = (state.inventory[itemId] || 0) + 1;
             item.effect();
-            logEvent('🛒 Куплено: ' + item.name, 'green');
+            logEvent('🛒 ' + item.name, 'green');
             checkMissions();
             checkAchievements();
             updateUI();
@@ -672,52 +835,130 @@
             updateUI();
         }
 
+        function petCat() {
+            state.catMood = Math.min(100, state.catMood + 10);
+            state.rubles += 5;
+            logEvent(' Барсик мурлычет! +5₽', 'purple');
+            updateUI();
+        }
+
+        function playLottery() {
+            if (state.rubles < 100) { logEvent('❌ Нужно 100₽!', 'red'); return; }
+            state.rubles -= 100;
+            const win = Math.random();
+            if (win < 0.1) {
+                state.rubles += 1000;
+                logEvent('🎰 ДЖЕКПОТ! +1000₽!', 'yellow');
+                createConfetti();
+            } else if (win < 0.3) {
+                state.rubles += 200;
+                logEvent('🎰 Выигрыш! +200₽', 'green');
+            } else if (win < 0.5) {
+                state.rubles += 50;
+                logEvent('🎰 Малый выигрыш! +50₽', 'blue');
+            } else {
+                logEvent('🎰 Не повезло...', 'red');
+            }
+            updateUI();
+        }
+
+        function startMinigame() {
+            if (state.minigameActive) return;
+            state.minigameActive = true;
+            state.minigameScore = 0;
+            let timeLeft = 30;
+            $('minigame-start-btn').disabled = true;
+            $('minigame-time').textContent = timeLeft;
+            $('minigame-score').textContent = '0';
+            
+            const area = $('minigame-area');
+            area.innerHTML = '';
+            
+            const spawnBelyash = () => {
+                if (!state.minigameActive) return;
+                const belyash = document.createElement('div');
+                belyash.textContent = '';
+                belyash.className = 'absolute text-4xl cursor-pointer';
+                belyash.style.left = Math.random() * 80 + '%';
+                belyash.style.top = Math.random() * 80 + '%';
+                belyash.onclick = () => {
+                    state.minigameScore++;
+                    state.rubles += 10;
+                    $('minigame-score').textContent = state.minigameScore;
+                    belyash.remove();
+                    updateUI();
+                };
+                area.appendChild(belyash);
+                setTimeout(() => belyash.remove(), 2000);
+            };
+            
+            const spawnInterval = setInterval(spawnBelyash, 800);
+            const timer = setInterval(() => {
+                timeLeft--;
+                $('minigame-time').textContent = timeLeft;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    clearInterval(spawnInterval);
+                    state.minigameActive = false;
+                    $('minigame-start-btn').disabled = false;
+                    logEvent('🎮 Мини-игра окончена! +' + (state.minigameScore * 10) + '₽', 'green');
+                    createConfetti();
+                }
+            }, 1000);
+        }
+
         function logEvent(text, color = 'gray') {
             const colors = { green: 'text-green-400', red: 'text-red-400', blue: 'text-blue-400', yellow: 'text-yellow-400', purple: 'text-purple-400', gray: 'text-gray-400' };
             const entry = document.createElement('div');
             entry.className = colors[color] || 'text-gray-400';
             entry.textContent = text;
-            elLog.insertBefore(entry, elLog.firstChild);
-            if (elLog.children.length > 50) elLog.lastChild.remove();
+            $('event-log').insertBefore(entry, $('event-log').firstChild);
+            if ($('event-log').children.length > 50) $('event-log').lastChild.remove();
         }
 
         function updateUI() {
-            elRubles.textContent = Math.floor(state.rubles);
-            elPower.textContent = state.clickPower + '₽';
-            elMission.textContent = (state.currentMissionIndex + 1) + '/' + MISSIONS.length;
-            elCombo.textContent = 'x' + state.combo;
-            elClickValue.textContent = state.clickPower * state.combo;
+            $('stat-rubles').textContent = Math.floor(state.rubles);
+            $('stat-power').textContent = state.clickPower + '₽';
+            $('stat-mission').textContent = (state.currentMissionIndex + 1) + '/' + MISSIONS.length;
+            $('stat-combo').textContent = 'x' + state.combo;
+            $('click-value').textContent = state.clickPower * state.combo;
 
             if (state.combo > 1) {
-                elComboDisplay.classList.remove('hidden');
-                elComboMultiplier.textContent = state.combo;
+                $('combo-display').classList.remove('hidden');
+                $('combo-multiplier').textContent = state.combo;
             } else {
-                elComboDisplay.classList.add('hidden');
+                $('combo-display').classList.add('hidden');
             }
+
+            const rankIdx = Math.min(RANKS.length - 1, Math.floor((state.level - 1) / 5));
+            $('rank-name').textContent = RANKS[rankIdx];
+            $('level-num').textContent = state.level;
+            $('level-progress').textContent = state.levelProgress;
+            $('level-required').textContent = state.levelRequired;
+            $('level-bar').style.width = (state.levelProgress / state.levelRequired * 100) + '%';
 
             if (state.currentMissionIndex < MISSIONS.length) {
                 const m = MISSIONS[state.currentMissionIndex];
                 const p = Math.min(getMissionProgress(m), m.target);
-                elCurrentMissionDisplay.textContent = m.icon + ' ' + m.title + ' — ' + m.desc;
-                elCurrentMissionBar.style.width = (p / m.target * 100) + '%';
-                elCurrentMissionProgress.textContent = p;
-                elCurrentMissionTarget.textContent = m.target;
+                $('current-mission-display').textContent = m.icon + ' ' + m.title + ' — ' + m.desc;
+                $('current-mission-bar').style.width = (p / m.target * 100) + '%';
+                $('current-mission-progress').textContent = p;
+                $('current-mission-target').textContent = m.target;
             } else {
-                elCurrentMissionDisplay.textContent = '🏆 Все миссии выполнены!';
-                elCurrentMissionBar.style.width = '100%';
-                elCurrentMissionProgress.textContent = '✓';
-                elCurrentMissionTarget.textContent = '✓';
+                $('current-mission-display').textContent = '🏆 Все миссии выполнены!';
+                $('current-mission-bar').style.width = '100%';
+                $('current-mission-progress').textContent = '✓';
+                $('current-mission-target').textContent = '✓';
             }
 
-            elTotalClicks.textContent = state.totalClicks;
-            elTotalCrits.textContent = state.totalCrits;
-            elCompletedMissions.textContent = state.completedMissions.size + '/' + MISSIONS.length;
-            elAutoPerSec.textContent = state.autoClickPower;
-            elTotalBonuses.textContent = state.totalBonuses;
-            elCatMood.textContent = state.catMood;
+            $('total-clicks').textContent = state.totalClicks;
+            $('total-crits').textContent = state.totalCrits;
+            $('completed-missions').textContent = state.completedMissions.size + '/' + MISSIONS.length;
+            $('auto-per-sec').textContent = state.autoClickPower;
+            $('total-bonuses').textContent = state.totalBonuses;
+            $('cat-mood').textContent = state.catMood;
 
-            // Missions
-            elMissionsList.innerHTML = MISSIONS.map((m, idx) => {
+            $('missions-list').innerHTML = MISSIONS.map((m, idx) => {
                 const completed = state.completedMissions.has(m.id);
                 const isCurrent = idx === state.currentMissionIndex;
                 const isLocked = idx > state.currentMissionIndex;
@@ -725,23 +966,22 @@
                 if (!completed && !isLocked) progress = getMissionProgress(m);
                 let cls = '', icon = '';
                 if (completed) { cls = 'opacity-50'; icon = '✅'; }
-                else if (isCurrent) { cls = 'mission-current'; icon = '🎯'; }
-                else if (isLocked) { cls = 'mission-locked'; icon = '🔒'; }
+                else if (isCurrent) { cls = 'mission-current'; icon = ''; }
+                else if (isLocked) { cls = 'mission-locked'; icon = ''; }
                 return `<div class="mission-item glass rounded-lg p-2 md:p-3 ${cls}">
                     <div class="flex items-center gap-2">
-                        <div class="text-xl md:text-2xl">${m.icon}</div>
+                        <div class="text-2xl">${m.icon}</div>
                         <div class="flex-1 min-w-0">
                             <div class="font-bold text-xs md:text-sm truncate">${icon} ${m.title}</div>
                             <div class="text-xs text-gray-400">${m.desc}</div>
                             <div class="text-xs text-yellow-400">+${m.reward}₽</div>
-                            ${!completed && !isLocked ? `<div class="w-full bg-gray-700 rounded-full h-1 mt-1"><div class="bg-gradient-to-r from-green-400 to-cyan-500 h-1 rounded-full progress-fill" style="width: ${Math.min(100, progress / m.target * 100)}%"></div></div>` : ''}
+                            ${!completed && !isLocked ? `<div class="w-full bg-gray-700 rounded-full h-1 mt-1"><div class="progress-fill h-1 rounded-full" style="width: ${Math.min(100, progress / m.target * 100)}%"></div></div>` : ''}
                         </div>
                     </div>
                 </div>`;
             }).join('');
 
-            // Shop
-            elShopList.innerHTML = SHOP.map(item => {
+            $('shop-list').innerHTML = SHOP.map(item => {
                 const owned = state.inventory[item.id] || 0;
                 const canBuy = state.rubles >= item.cost && (!item.oneTime || owned < 1);
                 return `<div class="shop-item glass rounded-lg p-2 md:p-3 ${!canBuy ? 'opacity-50' : ''}">
@@ -754,8 +994,7 @@
                 </div>`;
             }).join('');
 
-            // Upgrades
-            elUpgradesList.innerHTML = UPGRADES.map(u => `
+            $('upgrades-list').innerHTML = UPGRADES.map(u => `
                 <button onclick="buyUpgrade('${u.id}')" ${u.currentLevel >= u.maxLevel || state.rubles < u.cost ? 'disabled' : ''} class="upgrade-btn glass rounded-lg p-2 md:p-3 text-left w-full">
                     <div class="font-bold text-xs md:text-sm">${u.name} ${u.currentLevel >= u.maxLevel ? '✅' : ''}</div>
                     <div class="text-xs text-gray-400">${u.desc}</div>
@@ -763,32 +1002,30 @@
                 </button>
             `).join('');
 
-            // Inventory
             const invEntries = Object.entries(state.inventory).filter(([k, v]) => v > 0);
             if (invEntries.length === 0) {
-                elInventoryList.innerHTML = '<div class="col-span-full text-center text-gray-400 text-sm p-4">Склад пуст. Купи что-нибудь в магазине!</div>';
+                $('inventory-list').innerHTML = '<div class="col-span-full text-center text-gray-400 text-sm p-4">Склад пуст!</div>';
             } else {
-                elInventoryList.innerHTML = invEntries.map(([id, count]) => {
+                $('inventory-list').innerHTML = invEntries.map(([id, count]) => {
                     const item = SHOP.find(i => i.id === id);
                     return `<div class="inventory-item glass rounded-lg p-2 md:p-3 text-center">
-                        <div class="text-2xl md:text-3xl">${item ? item.name.split(' ')[0] : '📦'}</div>
+                        <div class="text-3xl">${item ? item.name.split(' ')[0] : '📦'}</div>
                         <div class="text-xs text-gray-400 truncate">${item ? item.name.split(' ').slice(1).join(' ') : id}</div>
                         <div class="text-sm font-bold text-yellow-400">x${count}</div>
                     </div>`;
                 }).join('');
             }
 
-            // Achievements
-            elAchievementsList.innerHTML = ACHIEVEMENTS.map(a => {
+            $('achievements-list').innerHTML = ACHIEVEMENTS.map(a => {
                 const unlocked = state.achievements.has(a.id);
-                return `<div class="glass rounded-lg p-2 md:p-3 ${unlocked ? '' : 'opacity-50'}">
-                    <div class="font-bold text-xs md:text-sm">${unlocked ? a.name : '🔒 ???'}</div>
+                return `<div class="glass rounded-lg p-2 md:p-3 rarity-${a.rarity} ${unlocked ? '' : 'opacity-50'}">
+                    <div class="font-bold text-xs md:text-sm">${unlocked ? a.name : ' ???'}</div>
                     <div class="text-xs text-gray-400">${unlocked ? a.desc : 'Не получено'}</div>
+                    <div class="text-xs mt-1 ${a.rarity === 'legendary' ? 'text-yellow-400' : a.rarity === 'epic' ? 'text-purple-400' : a.rarity === 'rare' ? 'text-blue-400' : 'text-gray-400'}">${a.rarity === 'legendary' ? '🌟 Легендарное' : a.rarity === 'epic' ? '💎 Эпическое' : a.rarity === 'rare' ? '⭐ Редкое' : 'Обычное'}</div>
                 </div>`;
             }).join('');
         }
 
-        // Auto clicker
         setInterval(() => {
             if (state.autoClickPower > 0) {
                 state.rubles += state.autoClickPower;
@@ -798,16 +1035,15 @@
             }
         }, 1000);
 
-        // Random events
         setInterval(() => {
-            if (state.gameOver || state.totalClicks < 20) return;
+            if (state.totalClicks < 20) return;
             if (Math.random() < 0.15) {
                 const event = RANDOM_EVENTS[Math.floor(Math.random() * RANDOM_EVENTS.length)];
                 $('event-modal-icon').textContent = event.icon;
                 $('event-modal-title').textContent = event.title;
                 $('event-modal-text').textContent = event.text;
                 $('event-modal-choices').innerHTML = event.choices.map((c, i) => 
-                    `<button onclick="chooseEvent(${i})" class="btn-action w-full glass rounded-lg p-2 md:p-3 text-left text-sm hover:bg-white/10">${c.text}</button>`
+                    `<button onclick="chooseEvent(${i})" class="w-full glass rounded-lg p-2 md:p-3 text-left text-sm hover:bg-white/10">${c.text}</button>`
                 ).join('');
                 $('event-modal').classList.remove('hidden');
                 window._currentEvent = event;
@@ -820,23 +1056,20 @@
             updateUI();
         }
 
-        // Random joke in log
         setInterval(() => {
             if (Math.random() < 0.3) {
-                const joke = JOKES[Math.floor(Math.random() * JOKES.length)];
-                logEvent('💬 ' + joke, 'gray');
+                $('random-joke').textContent = JOKES[Math.floor(Math.random() * JOKES.length)];
             }
-        }, 20000);
+        }, 15000);
 
-        // Cat mood decay
         setInterval(() => {
             state.catMood = Math.max(0, state.catMood - 1);
             updateUI();
         }, 5000);
 
         updateUI();
-        logEvent('🎮 Добро пожаловать, Аладдин Балдадашевич!', 'yellow');
-        logEvent('💡 Кликай чтобы зарабатывать рубли!', 'blue');
+        logEvent('✨ Добро пожаловать, Аладдин Балдадашевич!', 'yellow');
+        logEvent('💡 Кликай чтобы зарабатывать!', 'blue');
     </script>
 </body>
 </html>
