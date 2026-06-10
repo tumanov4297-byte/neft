@@ -130,7 +130,7 @@
             <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 bg-clip-text text-transparent">
                 Кликер Завхоза
             </h1>
-            <p class="text-gray-400 text-sm mt-1">ГБУ ЯНАО ЦСОН «Гармония» | Директор: Донсков Г.В.</p>
+            <p class="text-gray-400 text-sm mt-1">ГБУ ЯНАО ЦСОН «Гармония» </p>
         </header>
 
         <!-- Stats -->
@@ -326,7 +326,7 @@
 
         // Upgrades
         const UPGRADES = [
-            { id: 'power1', name: '💪 Сила клика +1', desc: 'Увеличивает силу клика на 1', cost: 50, costType: 'rubles', effect: () => { state.clickPower += 1; state.upgrades.power++; }, maxLevel: 100, currentLevel: 0 },
+            { id: 'power1', name: '💪 Сила завхоза +1', desc: 'Увеличивает силу клика на 1', cost: 50, costType: 'rubles', effect: () => { state.clickPower += 1; state.upgrades.power++; }, maxLevel: 100, currentLevel: 0 },
             { id: 'power2', name: '💪 Сила клика +5', desc: 'Увеличивает силу клика на 5', cost: 200, costType: 'rubles', effect: () => { state.clickPower += 5; state.upgrades.power++; }, maxLevel: 50, currentLevel: 0 },
             { id: 'crit1', name: '🎯 Крит шанс +5%', desc: 'Увеличивает шанс крита на 5%', cost: 100, costType: 'rubles', effect: () => { state.critChance += 5; state.upgrades.crit++; }, maxLevel: 10, currentLevel: 0 },
             { id: 'crit2', name: '💥 Крит множитель +1', desc: 'Увеличивает множитель крита', cost: 300, costType: 'rubles', effect: () => { state.critMulti += 1; state.upgrades.crit++; }, maxLevel: 10, currentLevel: 0 },
