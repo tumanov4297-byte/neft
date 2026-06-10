@@ -3,75 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Симулятор Завхоза — ГБУ ЯНАО ЦСОН "Гармония"</title>
+    <title>Кликер Завхоза — ГБУ ЯНАО ЦСОН "Гармония"</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.19/cyrillic.css" rel="stylesheet">
     <style>
-        * { font-family: 'Inter', sans-serif; }
+        * { font-family: 'Inter', sans-serif; user-select: none; }
         body {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             min-height: 100vh;
+            overflow-x: hidden;
         }
         .glass {
             background: rgba(255, 255, 255, 0.05);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .btn-action {
-            transition: all 0.2s ease;
+        .click-btn {
+            transition: all 0.1s ease;
             position: relative;
             overflow: hidden;
+            cursor: pointer;
         }
-        .btn-action:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        .click-btn:hover {
+            transform: scale(1.05);
         }
-        .btn-action:active:not(:disabled) {
-            transform: translateY(0);
+        .click-btn:active {
+            transform: scale(0.95);
         }
-        .btn-action:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
+        .click-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        .click-btn:active::before {
+            width: 300px;
+            height: 300px;
         }
         .particle {
             position: fixed;
             pointer-events: none;
             font-weight: bold;
-            animation: floatUp 1.5s ease-out forwards;
+            animation: floatUp 1s ease-out forwards;
             z-index: 1000;
         }
         @keyframes floatUp {
             0% { opacity: 1; transform: translateY(0) scale(1); }
-            100% { opacity: 0; transform: translateY(-100px) scale(1.5); }
+            100% { opacity: 0; transform: translateY(-150px) scale(1.5); }
         }
         .pulse-glow {
             animation: pulseGlow 2s ease-in-out infinite;
         }
         @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 20px rgba(234, 179, 8, 0.3); }
-            50% { box-shadow: 0 0 40px rgba(234, 179, 8, 0.6); }
-        }
-        .shake {
-            animation: shake 0.5s ease-in-out;
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+            0%, 100% { box-shadow: 0 0 30px rgba(234, 179, 8, 0.4); }
+            50% { box-shadow: 0 0 60px rgba(234, 179, 8, 0.8); }
         }
         .progress-fill {
-            transition: width 0.5s ease-out;
+            transition: width 0.3s ease-out;
         }
-        .log-entry {
-            animation: slideIn 0.3s ease-out;
+        .mission-item {
+            transition: all 0.3s ease;
         }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-20px); }
-            to { opacity: 1; transform: translateX(0); }
+        .mission-item:hover {
+            background: rgba(255,255,255,0.08);
+        }
+        .mission-locked {
+            opacity: 0.3;
+            filter: grayscale(100%);
+        }
+        .mission-current {
+            border: 2px solid rgba(234, 179, 8, 0.8);
+            background: rgba(234, 179, 8, 0.1);
+        }
+        .upgrade-btn {
+            transition: all 0.3s ease;
+        }
+        .upgrade-btn:hover:not(:disabled) {
+            transform: scale(1.02);
+        }
+        .upgrade-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
         }
         .tab-active {
             background: rgba(234, 179, 8, 0.2);
             border-color: rgba(234, 179, 8, 0.5);
+        }
+        .combo-text {
+            animation: comboAnim 0.5s ease-out;
+        }
+        @keyframes comboAnim {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .shake {
+            animation: shake 0.3s ease-in-out;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-3px); }
+            75% { transform: translateX(3px); }
         }
         .modal {
             animation: modalPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
@@ -83,322 +121,254 @@
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
         ::-webkit-scrollbar-thumb { background: rgba(234, 179, 8, 0.5); border-radius: 4px; }
-        .task-item {
-            transition: all 0.3s ease;
-        }
-        .task-item:hover {
-            background: rgba(255,255,255,0.05);
-        }
-        .staff-card {
-            transition: all 0.3s ease;
-        }
-        .staff-card:hover {
-            transform: scale(1.02);
-        }
     </style>
 </head>
-<body class="text-white overflow-x-hidden">
+<body class="text-white">
     <div id="app" class="max-w-7xl mx-auto p-4 md:p-6">
         <!-- Header -->
-        <header class="text-center mb-6">
-            <h1 class="text-3xl md:text-5xl font-bold bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 bg-clip-text text-transparent drop-shadow-lg">
-                Симулятор Завхоза
+        <header class="text-center mb-4">
+            <h1 class="text-3xl md:text-4xl font-bold bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400 bg-clip-text text-transparent">
+                Кликер Завхоза
             </h1>
-            <p class="text-gray-400 mt-2 text-sm md:text-base">ГБУ ЯНАО ЦСОН «Гармония» — полный контроль хозяйства</p>
-            <div class="mt-3 flex justify-center gap-6 text-sm flex-wrap">
-                <span class="text-yellow-400">📅 День: <span id="game-day">1</span></span>
-                <span class="text-blue-400">💰 Бюджет: <span id="game-budget">50000</span>₽</span>
-                <span class="text-green-400"> Рейтинг: <span id="game-rating">50</span>%</span>
-            </div>
+            <p class="text-gray-400 text-sm mt-1">ГБУ ЯНАО ЦСОН «Гармония» | Директор: Донсков Г.В.</p>
         </header>
 
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div class="glass rounded-xl p-4">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-yellow-400 font-bold text-sm">🏆 Авторитет</span>
-                    <span id="stat-authority" class="text-xl font-bold text-yellow-400">100</span>
-                </div>
-                <div class="w-full bg-gray-700 rounded-full h-2">
-                    <div id="bar-authority" class="bg-gradient-to-r from-yellow-400 to-orange-500 h-2 rounded-full progress-fill" style="width: 10%"></div>
-                </div>
+        <!-- Stats -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
+            <div class="glass rounded-lg p-3">
+                <div class="text-xs text-gray-400">💰 Рубли</div>
+                <div id="stat-rubles" class="text-xl font-bold text-yellow-400">0</div>
             </div>
-            <div class="glass rounded-xl p-4">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-blue-400 font-bold text-sm">🍵 Чай/Кофе</span>
-                    <span id="stat-tea" class="text-xl font-bold text-blue-400">50</span>
-                </div>
-                <div class="w-full bg-gray-700 rounded-full h-2">
-                    <div id="bar-tea" class="bg-gradient-to-r from-blue-400 to-cyan-500 h-2 rounded-full progress-fill" style="width: 50%"></div>
-                </div>
+            <div class="glass rounded-lg p-3">
+                <div class="text-xs text-gray-400">⚡ За клик</div>
+                <div id="stat-power" class="text-xl font-bold text-green-400">1₽</div>
             </div>
-            <div class="glass rounded-xl p-4">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-red-400 font-bold text-sm">⚠️ Штрафы</span>
-                    <span id="stat-fines" class="text-xl font-bold text-red-400">0</span>
-                </div>
-                <div class="w-full bg-gray-700 rounded-full h-2">
-                    <div id="bar-fines" class="bg-gradient-to-r from-red-400 to-pink-500 h-2 rounded-full progress-fill" style="width: 0%"></div>
-                </div>
+            <div class="glass rounded-lg p-3">
+                <div class="text-xs text-gray-400">🎯 Миссия</div>
+                <div id="stat-mission" class="text-xl font-bold text-blue-400">1/16</div>
             </div>
-            <div class="glass rounded-xl p-4">
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-purple-400 font-bold text-sm">⚡ Энергия</span>
-                    <span id="stat-energy" class="text-xl font-bold text-purple-400">100</span>
-                </div>
-                <div class="w-full bg-gray-700 rounded-full h-2">
-                    <div id="bar-energy" class="bg-gradient-to-r from-purple-400 to-pink-500 h-2 rounded-full progress-fill" style="width: 100%"></div>
-                </div>
+            <div class="glass rounded-lg p-3">
+                <div class="text-xs text-gray-400">🔥 Комбо</div>
+                <div id="stat-combo" class="text-xl font-bold text-red-400">x1</div>
+            </div>
+        </div>
+
+        <!-- Current Mission Display -->
+        <div class="glass rounded-xl p-4 mb-4 text-center border-2 border-yellow-500/50">
+            <div class="text-xs text-gray-400 mb-1"> ТЕКУЩАЯ МИССИЯ</div>
+            <div id="current-mission-display" class="text-lg font-bold text-yellow-400">Загрузка...</div>
+            <div class="w-full bg-gray-700 rounded-full h-3 mt-3">
+                <div id="current-mission-bar" class="bg-gradient-to-r from-yellow-400 to-orange-500 h-3 rounded-full progress-fill" style="width: 0%"></div>
+            </div>
+            <div class="text-xs text-gray-400 mt-1">
+                <span id="current-mission-progress">0</span> / <span id="current-mission-target">10</span>
+            </div>
+        </div>
+
+        <!-- Main Click Button -->
+        <div class="text-center mb-6">
+            <button id="main-click-btn" onclick="handleClick(event)" class="click-btn w-64 h-64 md:w-80 md:h-80 rounded-full bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 shadow-2xl pulse-glow flex flex-col items-center justify-center mx-auto">
+                <div class="text-6xl md:text-7xl mb-2">💰</div>
+                <div class="text-xl md:text-2xl font-bold text-white">КЛИК!</div>
+                <div class="text-sm text-white/80 mt-1">+<span id="click-value">1</span>₽ за клик</div>
+            </button>
+            <div id="combo-display" class="mt-4 text-2xl font-bold text-red-400 hidden combo-text">
+                🔥 КОМБО x<span id="combo-multiplier">1</span>!
             </div>
         </div>
 
         <!-- Tabs -->
-        <div class="flex flex-wrap gap-2 mb-6">
-            <button onclick="switchTab('tasks')" id="tab-tasks" class="btn-action glass rounded-lg px-4 py-2 text-sm tab-active">📋 Задачи</button>
-            <button onclick="switchTab('shop')" id="tab-shop" class="btn-action glass rounded-lg px-4 py-2 text-sm"> Закупки</button>
-            <button onclick="switchTab('staff')" id="tab-staff" class="btn-action glass rounded-lg px-4 py-2 text-sm">👥 Персонал</button>
-            <button onclick="switchTab('inventory')" id="tab-inventory" class="btn-action glass rounded-lg px-4 py-2 text-sm">📦 Склад</button>
-            <button onclick="switchTab('repairs')" id="tab-repairs" class="btn-action glass rounded-lg px-4 py-2 text-sm"> Ремонты</button>
+        <div class="flex flex-wrap gap-2 mb-4 justify-center">
+            <button onclick="switchTab('missions')" id="tab-missions" class="btn-action glass rounded-lg px-4 py-2 text-sm tab-active">📋 Миссии</button>
+            <button onclick="switchTab('upgrades')" id="tab-upgrades" class="btn-action glass rounded-lg px-4 py-2 text-sm"> Прокачка</button>
+            <button onclick="switchTab('auto')" id="tab-auto" class="btn-action glass rounded-lg px-4 py-2 text-sm">🤖 Авто</button>
+            <button onclick="switchTab('achievements')" id="tab-achievements" class="btn-action glass rounded-lg px-4 py-2 text-sm"> Достижения</button>
         </div>
 
         <!-- Tab Content -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <!-- Main Panel -->
             <div class="lg:col-span-2">
-                <!-- Tasks Tab -->
-                <div id="content-tasks" class="tab-content">
-                    <div class="glass rounded-2xl p-6 mb-6">
-                        <h3 class="text-xl font-bold text-yellow-400 mb-4">📋 Активные задачи</h3>
-                        <div id="tasks-list" class="space-y-3">
-                            <!-- Tasks injected by JS -->
-                        </div>
-                    </div>
-
-                    <!-- Quick Actions -->
-                    <div class="glass rounded-2xl p-6">
-                        <h3 class="text-xl font-bold text-green-400 mb-4">⚡ Быстрые действия</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <button onclick="actionPatrol(event)" class="btn-action glass rounded-xl p-4 text-left hover:bg-green-500/10">
-                                <div class="font-bold text-green-400"> Обход территории</div>
-                                <div class="text-xs text-gray-400 mt-1">Проверить состояние помещений</div>
-                            </button>
-                            <button onclick="actionTea(event)" class="btn-action glass rounded-xl p-4 text-left hover:bg-blue-500/10">
-                                <div class="font-bold text-blue-400">🍵 Пить чай</div>
-                                <div class="text-xs text-gray-400 mt-1">Восстановить энергию +10</div>
-                            </button>
-                            <button onclick="actionPaperwork(event)" class="btn-action glass rounded-xl p-4 text-left hover:bg-purple-500/10">
-                                <div class="font-bold text-purple-400">📄 Бумажная работа</div>
-                                <div class="text-xs text-gray-400 mt-1">Заполнить документы</div>
-                            </button>
-                            <button onclick="actionInspect(event)" class="btn-action glass rounded-xl p-4 text-left hover:bg-yellow-500/10">
-                                <div class="font-bold text-yellow-400">🔍 Инспекция</div>
-                                <div class="text-xs text-gray-400 mt-1">Проверить персонал</div>
-                            </button>
+                <!-- Missions Tab -->
+                <div id="content-missions" class="tab-content">
+                    <div class="glass rounded-xl p-4">
+                        <h3 class="text-lg font-bold text-yellow-400 mb-3">📋 Все миссии (по порядку)</h3>
+                        <div id="missions-list" class="space-y-2 max-h-96 overflow-y-auto">
+                            <!-- Missions injected by JS -->
                         </div>
                     </div>
                 </div>
 
-                <!-- Shop Tab -->
-                <div id="content-shop" class="tab-content hidden">
-                    <div class="glass rounded-2xl p-6">
-                        <h3 class="text-xl font-bold text-blue-400 mb-4">🛒 Закупки материалов</h3>
-                        <div id="shop-list" class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                            <!-- Shop items injected by JS -->
+                <!-- Upgrades Tab -->
+                <div id="content-upgrades" class="tab-content hidden">
+                    <div class="glass rounded-xl p-4">
+                        <h3 class="text-lg font-bold text-green-400 mb-3">⚡ Прокачка кнопки</h3>
+                        <div id="upgrades-list" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <!-- Upgrades injected by JS -->
                         </div>
                     </div>
                 </div>
 
-                <!-- Staff Tab -->
-                <div id="content-staff" class="tab-content hidden">
-                    <div class="glass rounded-2xl p-6">
-                        <h3 class="text-xl font-bold text-purple-400 mb-4">👥 Управление персоналом</h3>
-                        <div id="staff-list" class="space-y-3">
-                            <!-- Staff injected by JS -->
+                <!-- Auto Click Tab -->
+                <div id="content-auto" class="tab-content hidden">
+                    <div class="glass rounded-xl p-4">
+                        <h3 class="text-lg font-bold text-blue-400 mb-3">🤖 Авто-кликеры</h3>
+                        <div id="auto-list" class="space-y-2">
+                            <!-- Auto clickers injected by JS -->
                         </div>
                     </div>
                 </div>
 
-                <!-- Inventory Tab -->
-                <div id="content-inventory" class="tab-content hidden">
-                    <div class="glass rounded-2xl p-6">
-                        <h3 class="text-xl font-bold text-orange-400 mb-4">📦 Склад материалов</h3>
-                        <div id="inventory-list" class="grid grid-cols-2 md:grid-cols-3 gap-3">
-                            <!-- Inventory injected by JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Repairs Tab -->
-                <div id="content-repairs" class="tab-content hidden">
-                    <div class="glass rounded-2xl p-6">
-                        <h3 class="text-xl font-bold text-red-400 mb-4">🔧 Ремонтные работы</h3>
-                        <div id="repairs-list" class="space-y-3">
-                            <!-- Repairs injected by JS -->
+                <!-- Achievements Tab -->
+                <div id="content-achievements" class="tab-content hidden">
+                    <div class="glass rounded-xl p-4">
+                        <h3 class="text-lg font-bold text-pink-400 mb-3">🏆 Достижения</h3>
+                        <div id="achievements-list" class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                            <!-- Achievements injected by JS -->
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Sidebar -->
-            <div class="space-y-6">
-                <!-- Character -->
-                <div class="glass rounded-2xl p-6 text-center pulse-glow">
-                    <img src="https://vk.com/alishka990789?z=photo410604825_457247684%2F8859494a1e2db801b3" 
-                         alt="Завхоз" 
-                         class="w-32 h-32 mx-auto rounded-full shadow-2xl mb-3 object-cover">
-                    <h2 class="text-lg font-bold text-yellow-400">Алиев А.Б.</h2>
-                    <p class="text-gray-400 text-xs">Завхоз ГБУ ЯНАО ЦСОН «Гармония»</p>
-                    <p class="text-gray-500 text-xs mt-2 italic">Директор: Донсков Г.В.</p>
-                </div>
-
+            <div class="space-y-4">
                 <!-- Event Log -->
-                <div class="glass rounded-2xl p-6">
-                    <h3 class="text-xl font-bold text-green-400 mb-3">📋 Журнал</h3>
-                    <div id="event-log" class="space-y-2 max-h-96 overflow-y-auto pr-2">
-                        <div class="log-entry text-sm text-gray-400 italic">Новый рабочий день начался...</div>
+                <div class="glass rounded-xl p-4">
+                    <h3 class="text-lg font-bold text-green-400 mb-3">📋 Журнал</h3>
+                    <div id="event-log" class="space-y-1 max-h-64 overflow-y-auto text-xs">
+                        <div class="text-gray-400 italic">Игра началась! Кликай чтобы зарабатывать!</div>
                     </div>
                 </div>
 
-                <!-- Achievements -->
-                <div class="glass rounded-2xl p-6">
-                    <h3 class="text-xl font-bold text-pink-400 mb-3">🎖️ Достижения</h3>
-                    <div id="achievements" class="space-y-2">
-                        <!-- Injected by JS -->
+                <!-- Stats -->
+                <div class="glass rounded-xl p-4">
+                    <h3 class="text-lg font-bold text-purple-400 mb-3"> Статистика</h3>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Всего кликов:</span>
+                            <span id="total-clicks" class="text-yellow-400">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Критов:</span>
+                            <span id="total-crits" class="text-red-400">0</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Выполнено миссий:</span>
+                            <span id="completed-missions" class="text-green-400">0/16</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Авто-клик/сек:</span>
+                            <span id="auto-per-sec" class="text-blue-400">0</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- Footer -->
-        <footer class="text-center mt-8 text-gray-500 text-xs">
-            <p>© 2026 ГБУ ЯНАО ЦСОН «Гармония». Директор: Донсков Григорий Владимирович</p>
-        </footer>
     </div>
 
-    <!-- Event Modal -->
-    <div id="event-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden p-4">
-        <div class="modal glass rounded-2xl p-8 max-w-md w-full text-center">
-            <div id="modal-icon" class="text-6xl mb-4">⚠️</div>
-            <h3 id="modal-title" class="text-2xl font-bold text-yellow-400 mb-3">Событие!</h3>
-            <p id="modal-text" class="text-gray-300 mb-6">Текст события</p>
-            <div id="modal-choices" class="space-y-3"></div>
-        </div>
-    </div>
-
-    <!-- Task Modal -->
-    <div id="task-modal" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 hidden p-4">
-        <div class="modal glass rounded-2xl p-8 max-w-md w-full">
-            <h3 id="task-modal-title" class="text-xl font-bold text-yellow-400 mb-3">Задача</h3>
-            <p id="task-modal-desc" class="text-gray-300 mb-4">Описание</p>
-            <div id="task-modal-actions" class="space-y-2"></div>
-            <button onclick="closeTaskModal()" class="btn-action w-full glass rounded-lg p-3 mt-4 hover:bg-red-500/10">Закрыть</button>
+    <!-- Mission Complete Modal -->
+    <div id="mission-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden p-4">
+        <div class="glass rounded-2xl p-8 max-w-md w-full text-center modal">
+            <div id="mission-modal-icon" class="text-6xl mb-4">🎉</div>
+            <h3 id="mission-modal-title" class="text-2xl font-bold text-yellow-400 mb-3">Миссия выполнена!</h3>
+            <p id="mission-modal-text" class="text-gray-300 mb-4">Описание</p>
+            <div id="mission-modal-reward" class="text-lg font-bold text-green-400 mb-6">Награда: +100₽</div>
+            <button onclick="closeMissionModal()" class="btn-action bg-gradient-to-r from-yellow-500 to-orange-500 text-black font-bold py-3 px-8 rounded-xl">
+                Продолжить
+            </button>
         </div>
     </div>
 
     <script>
         // Game State
         const state = {
-            authority: 100,
-            tea: 50,
-            fines: 0,
-            energy: 100,
-            budget: 50000,
-            rating: 50,
-            day: 1,
-            tick: 0,
-            gameOver: false,
+            rubles: 0,
+            totalClicks: 0,
+            totalCrits: 0,
+            clickPower: 1,
+            combo: 1,
+            comboTimer: null,
+            lastClickTime: 0,
+            critChance: 5,
+            critMulti: 3,
+            autoClickers: 0,
+            autoClickPower: 0,
+            currentMissionIndex: 0,
             achievements: new Set(),
-            inventory: {
-                paper: 100,
-                cleaning: 50,
-                tools: 20,
-                tea: 30,
-                coffee: 20,
-                toilet: 40
-            },
-            staff: [
-                { id: 'cleaner1', name: 'Уборщица Мария', role: 'Уборка', salary: 15000, efficiency: 70, hired: true },
-                { id: 'plumber', name: 'Сантехник Иван', role: 'Ремонт', salary: 25000, efficiency: 80, hired: true },
-                { id: 'cleaner2', name: 'Уборщик Петр', role: 'Уборка', salary: 15000, efficiency: 60, hired: false }
-            ],
-            tasks: [
-                { id: 'task1', title: 'Проверить актовый зал', desc: 'Осмотреть состояние после вчерашнего мероприятия', reward: 50, energy: 10, completed: false },
-                { id: 'task2', title: 'Заполнить ведомость', desc: 'Составить отчет по расходам за неделю', reward: 30, energy: 15, completed: false },
-                { id: 'task3', title: 'Обойти кабинеты', desc: 'Проверить чистоту и порядок', reward: 40, energy: 12, completed: false }
-            ],
-            repairs: [
-                { id: 'repair1', title: 'Протечка в туалете', cost: 5000, completed: false, urgent: true },
-                { id: 'repair2', title: 'Сломанная дверь', cost: 3000, completed: false, urgent: false },
-                { id: 'repair3', title: 'Неисправное отопление', cost: 15000, completed: false, urgent: true }
-            ]
+            completedMissions: new Set(),
+            upgrades: {
+                power: 0,
+                crit: 0,
+                combo: 0,
+                auto: 0
+            }
         };
 
-        const SHOP_ITEMS = [
-            { id: 'paper', name: '📄 Бумага А4', cost: 500, amount: 50, desc: 'Для документов' },
-            { id: 'cleaning', name: '🧴 Моющие средства', cost: 800, amount: 30, desc: 'Для уборки' },
-            { id: 'tools', name: '🔧 Инструменты', cost: 2000, amount: 10, desc: 'Для ремонтов' },
-            { id: 'tea', name: '🍵 Чай', cost: 300, amount: 20, desc: 'Для буфета' },
-            { id: 'coffee', name: ' Кофе', cost: 600, amount: 15, desc: 'Для бухгалтерии' },
-            { id: 'toilet', name: '🧻 Туалетная бумага', cost: 400, amount: 40, desc: 'Расходник' }
+        // Missions - sequential, each unlocks the next
+        const MISSIONS = [
+            { id: 'm1', title: 'Первый клик', desc: 'Сделай 1 клик', target: 1, type: 'clicks', reward: 10, icon: '👶' },
+            { id: 'm2', title: 'Разминка', desc: 'Сделай 10 кликов', target: 10, type: 'clicks', reward: 20, icon: '🏃' },
+            { id: 'm3', title: 'Накопи 50 рублей', desc: 'Заработай 50₽', target: 50, type: 'rubles', reward: 30, icon: '💰' },
+            { id: 'm4', title: 'Активный завхоз', desc: 'Сделай 50 кликов', target: 50, type: 'clicks', reward: 50, icon: '💪' },
+            { id: 'm5', title: 'Накопи 200 рублей', desc: 'Заработай 200₽', target: 200, type: 'rubles', reward: 100, icon: '' },
+            { id: 'm6', title: 'Сотня кликов', desc: 'Сделай 100 кликов', target: 100, type: 'clicks', reward: 150, icon: '🎯' },
+            { id: 'm7', title: 'Критический удар', desc: 'Сделай 1 критический клик', target: 1, type: 'crits', reward: 100, icon: '💥' },
+            { id: 'm8', title: 'Накопи 500 рублей', desc: 'Заработай 500₽', target: 500, type: 'rubles', reward: 200, icon: '💎' },
+            { id: 'm9', title: 'Комбо мастер', desc: 'Достигни комбо x5', target: 5, type: 'combo', reward: 200, icon: '🔥' },
+            { id: 'm10', title: 'Первая прокачка', desc: 'Купи любую прокачку', target: 1, type: 'upgrades', reward: 150, icon: '' },
+            { id: 'm11', title: 'Марафон', desc: 'Сделай 500 кликов', target: 500, type: 'clicks', reward: 300, icon: '' },
+            { id: 'm12', title: 'Накопи 1000 рублей', desc: 'Заработай 1000₽', target: 1000, type: 'rubles', reward: 500, icon: '' },
+            { id: 'm13', title: 'Автономность', desc: 'Купи 3 авто-кликера', target: 3, type: 'auto', reward: 400, icon: '' },
+            { id: 'm14', title: 'Комбо легенда', desc: 'Достигни комбо x10', target: 10, type: 'combo', reward: 500, icon: '⚡' },
+            { id: 'm15', title: 'Тысяча кликов', desc: 'Сделай 1000 кликов', target: 1000, type: 'clicks', reward: 800, icon: '🌟' },
+            { id: 'm16', title: 'Лучший завхоз', desc: 'Заработай 5000₽', target: 5000, type: 'rubles', reward: 2000, icon: '🏅' }
         ];
 
-        const EVENTS = [
-            {
-                icon: '', title: 'Донсков Г.В. вызывает!',
-                text: 'Директор Донсков Григорий Владимирович требует вас в кабинет для отчета!',
-                choices: [
-                    { text: '📊 Подготовить отчет (Энергия -20)', effect: () => { state.energy -= 20; state.authority += 20; logEvent('✅ Отчет сдан! Донсков доволен. Авторитет +20', 'green'); } },
-                    { text: ' Сослаться на занятость', effect: () => { state.fines += 10; logEvent('❌ Донсков недоволен! Штраф +10', 'red'); } }
-                ]
-            },
-            {
-                icon: '💧', title: 'Авария!',
-                text: 'Прорвало трубу в актовом зале! Нужны срочные меры!',
-                choices: [
-                    { text: '🔧 Вызвать сантехника (Бюджет -5000)', effect: () => { if (state.budget >= 5000) { state.budget -= 5000; state.authority += 30; logEvent('✅ Сантехник приехал! Проблема решена. Авторитет +30', 'green'); } else { state.fines += 20; logEvent('❌ Нет денег! Донсков в ярости! Штраф +20', 'red'); } } },
-                    { text: '🪣 Поставить ведро', effect: () => { state.fines += 15; logEvent('️ Временное решение. Донсков недоволен. Штраф +15', 'red'); } }
-                ]
-            },
-            {
-                icon: '📦', title: 'Поставка материалов',
-                text: 'Приехала машина с материалами. Нужно принять и разместить на складе.',
-                choices: [
-                    { text: '✅ Принять по накладной', effect: () => { state.inventory.paper += 50; state.inventory.cleaning += 30; logEvent('📦 Материалы приняты! Бумага +50, Моющие +30', 'green'); } },
-                    { text: '📋 Проверить качество', effect: () => { state.energy -= 10; state.inventory.paper += 50; logEvent('✅ Качество проверено. Бумага +50', 'blue'); } }
-                ]
-            },
-            {
-                icon: '', title: 'Жалоба от сотрудника',
-                text: 'Бухгалтер жалуется на холод в кабинете!',
-                choices: [
-                    { text: '🔧 Починить отопление (Бюджет -3000)', effect: () => { if (state.budget >= 3000) { state.budget -= 3000; state.rating += 10; logEvent('✅ Отопление починено! Рейтинг +10', 'green'); } else { state.fines += 10; logEvent('❌ Нет денег! Жалоба не решена. Штраф +10', 'red'); } } },
-                    { text: '🧥 Выдать обогреватель', effect: () => { state.rating += 5; logEvent('🧥 Обогреватель выдан. Рейтинг +5', 'blue'); } }
-                ]
-            }
+        // Upgrades
+        const UPGRADES = [
+            { id: 'power1', name: '💪 Сила клика +1', desc: 'Увеличивает силу клика на 1', cost: 50, costType: 'rubles', effect: () => { state.clickPower += 1; state.upgrades.power++; }, maxLevel: 100, currentLevel: 0 },
+            { id: 'power2', name: '💪 Сила клика +5', desc: 'Увеличивает силу клика на 5', cost: 200, costType: 'rubles', effect: () => { state.clickPower += 5; state.upgrades.power++; }, maxLevel: 50, currentLevel: 0 },
+            { id: 'crit1', name: '🎯 Крит шанс +5%', desc: 'Увеличивает шанс крита на 5%', cost: 100, costType: 'rubles', effect: () => { state.critChance += 5; state.upgrades.crit++; }, maxLevel: 10, currentLevel: 0 },
+            { id: 'crit2', name: '💥 Крит множитель +1', desc: 'Увеличивает множитель крита', cost: 300, costType: 'rubles', effect: () => { state.critMulti += 1; state.upgrades.crit++; }, maxLevel: 10, currentLevel: 0 },
+            { id: 'combo1', name: ' Комбо время +1с', desc: 'Увеличивает время комбо', cost: 150, costType: 'rubles', effect: () => { state.upgrades.combo++; }, maxLevel: 10, currentLevel: 0 },
+            { id: 'auto1', name: ' Авто-кликер', desc: 'Автоматически +1₽/сек', cost: 100, costType: 'rubles', effect: () => { state.autoClickers += 1; state.autoClickPower += 1; state.upgrades.auto++; }, maxLevel: 50, currentLevel: 0 }
         ];
 
-        const ACHIEVEMENTS_LIST = [
-            { id: 'first_task', name: '📋 Первая задача', check: () => state.tasks.some(t => t.completed) },
-            { id: 'budget_master', name: '💰 Экономный завхоз', check: () => state.budget >= 100000 },
-            { id: 'authority_500', name: ' Авторитет 500', check: () => state.authority >= 500 },
-            { id: 'day_7', name: '📅 Неделя работы', check: () => state.day >= 7 },
-            { id: 'no_fines', name: '⭐ Без штрафов', check: () => state.day >= 5 && state.fines === 0 }
+        // Achievements
+        const ACHIEVEMENTS = [
+            { id: 'a1', name: ' Первый клик', desc: 'Сделай первый клик', check: () => state.totalClicks >= 1 },
+            { id: 'a2', name: '🔥 Комбо x5', desc: 'Достигни комбо x5', check: () => state.combo >= 5 },
+            { id: 'a3', name: '💥 Критический удар', desc: 'Сделай критический клик', check: () => state.totalCrits >= 1 },
+            { id: 'a4', name: '💰 Первые 100₽', desc: 'Заработай 100 рублей', check: () => state.rubles >= 100 },
+            { id: 'a5', name: '💎 Тысячник', desc: 'Заработай 1000₽', check: () => state.rubles >= 1000 },
+            { id: 'a6', name: '💪 Сила 10', desc: 'Достигни 10 силы клика', check: () => state.clickPower >= 10 },
+            { id: 'a7', name: '🤖 Автономность', desc: 'Купи авто-кликер', check: () => state.autoClickers >= 1 },
+            { id: 'a8', name: '📋 Миссионер', desc: 'Выполни 5 миссий', check: () => state.completedMissions.size >= 5 },
+            { id: 'a9', name: '🏆 Легенда', desc: 'Сделай 1000 кликов', check: () => state.totalClicks >= 1000 },
+            { id: 'a10', name: ' Мастер', desc: 'Выполни все миссии', check: () => state.completedMissions.size >= MISSIONS.length }
         ];
 
         // DOM Elements
-        const elAuthority = document.getElementById('stat-authority');
-        const elTea = document.getElementById('stat-tea');
-        const elFines = document.getElementById('stat-fines');
-        const elEnergy = document.getElementById('stat-energy');
-        const elBarAuthority = document.getElementById('bar-authority');
-        const elBarTea = document.getElementById('bar-tea');
-        const elBarFines = document.getElementById('bar-fines');
-        const elBarEnergy = document.getElementById('bar-energy');
-        const elBudget = document.getElementById('game-budget');
-        const elDay = document.getElementById('game-day');
-        const elRating = document.getElementById('game-rating');
+        const elRubles = document.getElementById('stat-rubles');
+        const elPower = document.getElementById('stat-power');
+        const elMission = document.getElementById('stat-mission');
+        const elCombo = document.getElementById('stat-combo');
+        const elClickValue = document.getElementById('click-value');
+        const elComboDisplay = document.getElementById('combo-display');
+        const elComboMultiplier = document.getElementById('combo-multiplier');
+        const elCurrentMissionDisplay = document.getElementById('current-mission-display');
+        const elCurrentMissionBar = document.getElementById('current-mission-bar');
+        const elCurrentMissionProgress = document.getElementById('current-mission-progress');
+        const elCurrentMissionTarget = document.getElementById('current-mission-target');
+        const elMissionsList = document.getElementById('missions-list');
+        const elUpgradesList = document.getElementById('upgrades-list');
+        const elAutoList = document.getElementById('auto-list');
+        const elAchievementsList = document.getElementById('achievements-list');
         const elLog = document.getElementById('event-log');
-        const elAchievements = document.getElementById('achievements');
+        const elTotalClicks = document.getElementById('total-clicks');
+        const elTotalCrits = document.getElementById('total-crits');
+        const elCompletedMissions = document.getElementById('completed-missions');
+        const elAutoPerSec = document.getElementById('auto-per-sec');
 
         function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -408,305 +378,270 @@
             updateUI();
         }
 
-        function updateUI() {
-            elAuthority.textContent = Math.floor(state.authority);
-            elTea.textContent = Math.floor(state.tea);
-            elFines.textContent = Math.floor(state.fines);
-            elEnergy.textContent = Math.floor(state.energy);
-            elBudget.textContent = state.budget;
-            elDay.textContent = state.day;
-            elRating.textContent = state.rating;
+        function handleClick(e) {
+            const now = Date.now();
+            const timeDiff = now - state.lastClickTime;
+            
+            // Combo system
+            if (timeDiff < 1000 + (state.upgrades.combo * 1000)) {
+                state.combo = Math.min(10, state.combo + 1);
+            } else {
+                state.combo = 1;
+            }
+            state.lastClickTime = now;
+            
+            clearTimeout(state.comboTimer);
+            state.comboTimer = setTimeout(() => {
+                state.combo = 1;
+                updateUI();
+            }, 2000 + (state.upgrades.combo * 1000));
 
-            elBarAuthority.style.width = Math.min(100, state.authority / 10) + '%';
-            elBarTea.style.width = Math.min(100, state.tea) + '%';
-            elBarFines.style.width = Math.min(100, state.fines) + '%';
-            elBarEnergy.style.width = Math.min(100, state.energy) + '%';
+            // Calculate click value
+            let clickValue = state.clickPower * state.combo;
+            let isCrit = false;
 
-            // Tasks
-            const tasksList = document.getElementById('tasks-list');
-            tasksList.innerHTML = state.tasks.map(t => `
-                <div class="task-item glass rounded-lg p-3 ${t.completed ? 'opacity-50' : ''}">
-                    <div class="flex justify-between items-start">
-                        <div class="flex-1">
-                            <div class="font-bold text-sm">${t.completed ? '✅' : '📋'} ${t.title}</div>
-                            <div class="text-xs text-gray-400 mt-1">${t.desc}</div>
-                            <div class="text-xs text-yellow-400 mt-1">Награда: ${t.reward} | Энергия: ${t.energy}</div>
-                        </div>
-                        ${!t.completed ? `<button onclick="completeTask('${t.id}')" class="btn-action bg-green-500/20 rounded px-3 py-1 text-xs hover:bg-green-500/30">Выполнить</button>` : ''}
-                    </div>
-                </div>
-            `).join('');
+            // Critical hit
+            if (Math.random() * 100 < state.critChance) {
+                clickValue *= state.critMulti;
+                isCrit = true;
+                state.totalCrits++;
+            }
 
-            // Shop
-            const shopList = document.getElementById('shop-list');
-            shopList.innerHTML = SHOP_ITEMS.map(item => `
-                <div class="glass rounded-lg p-3">
-                    <div class="font-bold text-sm">${item.name}</div>
-                    <div class="text-xs text-gray-400">${item.desc}</div>
-                    <div class="text-xs text-yellow-400 mt-1">${item.cost}₽ за ${item.amount}шт</div>
-                    <button onclick="buyItem('${item.id}')" ${state.budget < item.cost ? 'disabled' : ''} class="btn-action w-full bg-blue-500/20 rounded px-3 py-1 text-xs mt-2 hover:bg-blue-500/30">Купить</button>
-                </div>
-            `).join('');
+            state.rubles += clickValue;
+            state.totalClicks++;
 
-            // Staff
-            const staffList = document.getElementById('staff-list');
-            staffList.innerHTML = state.staff.map(s => `
-                <div class="staff-card glass rounded-lg p-3">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <div class="font-bold text-sm">${s.name}</div>
-                            <div class="text-xs text-gray-400">${s.role} | Эффективность: ${s.efficiency}%</div>
-                            <div class="text-xs text-yellow-400">Зарплата: ${s.salary}₽/день</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-xs ${s.hired ? 'text-green-400' : 'text-red-400'}">${s.hired ? '✅ Работает' : '❌ Не нанят'}</div>
-                            ${!s.hired ? `<button onclick="hireStaff('${s.id}')" class="btn-action bg-purple-500/20 rounded px-3 py-1 text-xs mt-2 hover:bg-purple-500/30">Нанять</button>` : ''}
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+            // Visual feedback
+            const rect = e.currentTarget.getBoundingClientRect();
+            const x = e.clientX || (rect.left + rect.width / 2);
+            const y = e.clientY || (rect.top + rect.height / 2);
+            
+            spawnParticle(x, y, `+${Math.floor(clickValue)}₽`, isCrit ? '#ff0000' : '#facc15', isCrit);
+            
+            if (isCrit) {
+                document.getElementById('main-click-btn').classList.add('shake');
+                setTimeout(() => document.getElementById('main-click-btn').classList.remove('shake'), 300);
+            }
 
-            // Inventory
-            const inventoryList = document.getElementById('inventory-list');
-            inventoryList.innerHTML = Object.entries(state.inventory).map(([key, val]) => `
-                <div class="glass rounded-lg p-3 text-center">
-                    <div class="text-2xl mb-1">${key === 'paper' ? '📄' : key === 'cleaning' ? '🧴' : key === 'tools' ? '🔧' : key === 'tea' ? '🍵' : key === 'coffee' ? '☕' : '🧻'}</div>
-                    <div class="text-xs text-gray-400">${key === 'paper' ? 'Бумага' : key === 'cleaning' ? 'Моющие' : key === 'tools' ? 'Инструменты' : key === 'tea' ? 'Чай' : key === 'coffee' ? 'Кофе' : 'Туал. бумага'}</div>
-                    <div class="text-lg font-bold text-yellow-400">${val}</div>
-                </div>
-            `).join('');
+            checkMissions();
+            checkAchievements();
+            updateUI();
+        }
 
-            // Repairs
-            const repairsList = document.getElementById('repairs-list');
-            repairsList.innerHTML = state.repairs.map(r => `
-                <div class="glass rounded-lg p-3 ${r.completed ? 'opacity-50' : ''}">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <div class="font-bold text-sm">${r.completed ? '✅' : r.urgent ? '🚨' : '🔧'} ${r.title}</div>
-                            <div class="text-xs text-yellow-400">Стоимость: ${r.cost}₽</div>
-                        </div>
-                        ${!r.completed ? `<button onclick="doRepair('${r.id}')" ${state.budget < r.cost ? 'disabled' : ''} class="btn-action bg-red-500/20 rounded px-3 py-1 text-xs hover:bg-red-500/30">Починить</button>` : ''}
-                    </div>
-                </div>
-            `).join('');
+        function spawnParticle(x, y, text, color, isCrit = false) {
+            const el = document.createElement('div');
+            el.className = 'particle';
+            el.textContent = text;
+            el.style.left = x + 'px';
+            el.style.top = y + 'px';
+            el.style.color = color;
+            el.style.fontSize = isCrit ? '2rem' : '1.2rem';
+            el.style.fontWeight = 'bold';
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 1000);
+        }
 
-            // Achievements
-            elAchievements.innerHTML = ACHIEVEMENTS_LIST.map(a => {
-                const unlocked = state.achievements.has(a.id);
-                return `<div class="text-sm ${unlocked ? 'text-yellow-400' : 'text-gray-600'}">${unlocked ? a.name : '🔒 ???'}</div>`;
-            }).join('');
+        function getCurrentMissionProgress(mission) {
+            if (mission.type === 'clicks') return state.totalClicks;
+            if (mission.type === 'rubles') return state.rubles;
+            if (mission.type === 'crits') return state.totalCrits;
+            if (mission.type === 'combo') return state.combo;
+            if (mission.type === 'auto') return state.autoClickers;
+            if (mission.type === 'upgrades') return state.upgrades.power + state.upgrades.crit + state.upgrades.combo + state.upgrades.auto;
+            return 0;
+        }
 
-            // Check achievements
-            ACHIEVEMENTS_LIST.forEach(a => {
-                if (!state.achievements.has(a.id) && a.check()) {
-                    state.achievements.add(a.id);
-                    logEvent(`🎖️ Достижение: ${a.name}!`, 'yellow');
+        function checkMissions() {
+            // Only check current mission (sequential)
+            if (state.currentMissionIndex >= MISSIONS.length) return;
+            
+            const currentMission = MISSIONS[state.currentMissionIndex];
+            const progress = getCurrentMissionProgress(currentMission);
+            
+            if (progress >= currentMission.target) {
+                state.completedMissions.add(currentMission.id);
+                state.rubles += currentMission.reward;
+                state.currentMissionIndex++;
+                showMissionModal(currentMission);
+                logEvent(`✅ Миссия выполнена: ${currentMission.title}! +${currentMission.reward}₽`, 'green');
+            }
+        }
+
+        function checkAchievements() {
+            ACHIEVEMENTS.forEach(ach => {
+                if (!state.achievements.has(ach.id) && ach.check()) {
+                    state.achievements.add(ach.id);
+                    logEvent(`🎖️ Достижение: ${ach.name}`, 'yellow');
                 }
             });
+        }
 
-            // Check game over
-            if (!state.gameOver) {
-                if (state.fines >= 100) {
-                    state.gameOver = true;
-                    showEnd(false);
-                }
-            }
+        function showMissionModal(mission) {
+            document.getElementById('mission-modal-icon').textContent = mission.icon;
+            document.getElementById('mission-modal-title').textContent = 'Миссия выполнена!';
+            document.getElementById('mission-modal-text').textContent = mission.desc;
+            document.getElementById('mission-modal-reward').textContent = `Награда: +${mission.reward}₽`;
+            document.getElementById('mission-modal').classList.remove('hidden');
+        }
+
+        function closeMissionModal() {
+            document.getElementById('mission-modal').classList.add('hidden');
+            updateUI();
+        }
+
+        function buyUpgrade(upgradeId) {
+            const upgrade = UPGRADES.find(u => u.id === upgradeId);
+            if (!upgrade || upgrade.currentLevel >= upgrade.maxLevel || state.rubles < upgrade.cost) return;
+            
+            state.rubles -= upgrade.cost;
+            upgrade.currentLevel++;
+            upgrade.effect();
+            upgrade.cost = Math.floor(upgrade.cost * 1.5);
+            
+            logEvent(`⚡ Куплено: ${upgrade.name}`, 'green');
+            checkMissions();
+            checkAchievements();
+            updateUI();
         }
 
         function logEvent(text, color = 'gray') {
             const colors = { green: 'text-green-400', red: 'text-red-400', blue: 'text-blue-400', yellow: 'text-yellow-400', purple: 'text-purple-400', gray: 'text-gray-400' };
             const entry = document.createElement('div');
-            entry.className = `log-entry text-sm ${colors[color] || 'text-gray-400'}`;
-            entry.textContent = `[День ${state.day}] ${text}`;
+            entry.className = `${colors[color] || 'text-gray-400'}`;
+            entry.textContent = text;
             elLog.insertBefore(entry, elLog.firstChild);
             if (elLog.children.length > 50) elLog.lastChild.remove();
         }
 
-        function completeTask(taskId) {
-            const task = state.tasks.find(t => t.id === taskId);
-            if (!task || task.completed || state.energy < task.energy) {
-                logEvent('❌ Недостаточно энергии!', 'red');
-                return;
+        function updateUI() {
+            elRubles.textContent = Math.floor(state.rubles);
+            elPower.textContent = state.clickPower + '₽';
+            elMission.textContent = `${state.currentMissionIndex + 1}/${MISSIONS.length}`;
+            elCombo.textContent = `x${state.combo}`;
+            elClickValue.textContent = state.clickPower * state.combo;
+
+            if (state.combo > 1) {
+                elComboDisplay.classList.remove('hidden');
+                elComboMultiplier.textContent = state.combo;
+            } else {
+                elComboDisplay.classList.add('hidden');
             }
-            state.energy -= task.energy;
-            state.authority += task.reward;
-            task.completed = true;
-            logEvent(`✅ Задача выполнена: ${task.title}. Авторитет +${task.reward}`, 'green');
-            updateUI();
-        }
 
-        function buyItem(itemId) {
-            const item = SHOP_ITEMS.find(i => i.id === itemId);
-            if (!item || state.budget < item.cost) {
-                logEvent('❌ Недостаточно бюджета!', 'red');
-                return;
+            // Current mission display
+            if (state.currentMissionIndex < MISSIONS.length) {
+                const currentMission = MISSIONS[state.currentMissionIndex];
+                const progress = getCurrentMissionProgress(currentMission);
+                const progressPercent = Math.min(100, (progress / currentMission.target) * 100);
+                
+                elCurrentMissionDisplay.textContent = `${currentMission.icon} ${currentMission.title} — ${currentMission.desc}`;
+                elCurrentMissionBar.style.width = `${progressPercent}%`;
+                elCurrentMissionProgress.textContent = Math.min(progress, currentMission.target);
+                elCurrentMissionTarget.textContent = currentMission.target;
+            } else {
+                elCurrentMissionDisplay.textContent = ' Все миссии выполнены!';
+                elCurrentMissionBar.style.width = '100%';
+                elCurrentMissionProgress.textContent = '✓';
+                elCurrentMissionTarget.textContent = '✓';
             }
-            state.budget -= item.cost;
-            state.inventory[itemId] += item.amount;
-            logEvent(`🛒 Куплено: ${item.name} x${item.amount}`, 'blue');
-            updateUI();
-        }
 
-        function hireStaff(staffId) {
-            const staff = state.staff.find(s => s.id === staffId);
-            if (!staff || staff.hired) return;
-            staff.hired = true;
-            logEvent(`👥 Нанят: ${staff.name}`, 'purple');
-            updateUI();
-        }
+            // Stats
+            elTotalClicks.textContent = state.totalClicks;
+            elTotalCrits.textContent = state.totalCrits;
+            elCompletedMissions.textContent = `${state.completedMissions.size}/${MISSIONS.length}`;
+            elAutoPerSec.textContent = state.autoClickPower;
 
-        function doRepair(repairId) {
-            const repair = state.repairs.find(r => r.id === repairId);
-            if (!repair || repair.completed || state.budget < repair.cost) {
-                logEvent('❌ Недостаточно бюджета!', 'red');
-                return;
-            }
-            state.budget -= repair.cost;
-            repair.completed = true;
-            state.authority += 50;
-            state.rating += 10;
-            logEvent(`🔧 Ремонт выполнен: ${repair.title}. Авторитет +50`, 'green');
-            updateUI();
-        }
+            // Missions list - show all with status
+            elMissionsList.innerHTML = MISSIONS.map((m, idx) => {
+                const completed = state.completedMissions.has(m.id);
+                const isCurrent = idx === state.currentMissionIndex;
+                const isLocked = idx > state.currentMissionIndex;
+                
+                let progress = 0;
+                if (!completed && !isLocked) {
+                    progress = getCurrentMissionProgress(m);
+                }
 
-        function actionPatrol(e) {
-            if (state.energy < 15) {
-                logEvent('❌ Недостаточно энергии!', 'red');
-                return;
-            }
-            state.energy -= 15;
-            state.authority += 20;
-            state.rating += 5;
-            logEvent('🚶 Обход завершен. Авторитет +20, Рейтинг +5', 'green');
-            updateUI();
-        }
+                let statusClass = '';
+                let statusIcon = '';
+                if (completed) {
+                    statusClass = 'opacity-50';
+                    statusIcon = '✅';
+                } else if (isCurrent) {
+                    statusClass = 'mission-current';
+                    statusIcon = '🎯';
+                } else if (isLocked) {
+                    statusClass = 'mission-locked';
+                    statusIcon = '🔒';
+                }
 
-        function actionTea(e) {
-            if (state.inventory.tea < 5) {
-                logEvent('❌ Нет чая на складе!', 'red');
-                return;
-            }
-            state.inventory.tea -= 5;
-            state.energy = Math.min(100, state.energy + 20);
-            state.tea += 10;
-            logEvent(' Чай выпит. Энергия +20', 'blue');
-            updateUI();
-        }
+                return `
+                    <div class="mission-item glass rounded-lg p-3 ${statusClass}">
+                        <div class="flex items-center gap-3">
+                            <div class="text-2xl">${m.icon}</div>
+                            <div class="flex-1">
+                                <div class="font-bold text-sm">${statusIcon} ${m.title}</div>
+                                <div class="text-xs text-gray-400">${m.desc}</div>
+                                <div class="text-xs text-yellow-400 mt-1">Награда: ${m.reward}₽</div>
+                                ${!completed && !isLocked ? `
+                                    <div class="w-full bg-gray-700 rounded-full h-1 mt-2">
+                                        <div class="bg-gradient-to-r from-green-400 to-cyan-500 h-1 rounded-full progress-fill" style="width: ${Math.min(100, (progress / m.target) * 100)}%"></div>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
 
-        function actionPaperwork(e) {
-            if (state.energy < 20 || state.inventory.paper < 10) {
-                logEvent('❌ Нужно больше энергии или бумаги!', 'red');
-                return;
-            }
-            state.energy -= 20;
-            state.inventory.paper -= 10;
-            state.authority += 30;
-            logEvent('📄 Документы заполнены. Авторитет +30', 'purple');
-            updateUI();
-        }
-
-        function actionInspect(e) {
-            if (state.energy < 10) {
-                logEvent(' Недостаточно энергии!', 'red');
-                return;
-            }
-            state.energy -= 10;
-            state.rating += 8;
-            logEvent('🔍 Персонал проверен. Рейтинг +8', 'yellow');
-            updateUI();
-        }
-
-        function showModal(event) {
-            const modal = document.getElementById('event-modal');
-            document.getElementById('modal-icon').textContent = event.icon;
-            document.getElementById('modal-title').textContent = event.title;
-            document.getElementById('modal-text').textContent = event.text;
-            document.getElementById('modal-choices').innerHTML = event.choices.map((c, i) => `
-                <button onclick="chooseModal(${i})" class="btn-action w-full glass rounded-lg p-3 text-left hover:bg-white/10">
-                    ${c.text}
+            // Upgrades
+            elUpgradesList.innerHTML = UPGRADES.map(u => `
+                <button onclick="buyUpgrade('${u.id}')" ${u.currentLevel >= u.maxLevel || state.rubles < u.cost ? 'disabled' : ''} class="upgrade-btn glass rounded-lg p-3 text-left w-full">
+                    <div class="font-bold text-sm">${u.name} ${u.currentLevel >= u.maxLevel ? '✅' : ''}</div>
+                    <div class="text-xs text-gray-400">${u.desc}</div>
+                    <div class="text-xs text-yellow-400 mt-1">${u.currentLevel >= u.maxLevel ? 'Максимум' : `Цена: ${u.cost}₽ | Ур: ${u.currentLevel}/${u.maxLevel}`}</div>
                 </button>
             `).join('');
-            modal.classList.remove('hidden');
-            window._currentEvent = event;
+
+            // Auto clickers
+            elAutoList.innerHTML = `
+                <div class="glass rounded-lg p-3">
+                    <div class="font-bold">🤖 Авто-кликеры: ${state.autoClickers}</div>
+                    <div class="text-xs text-gray-400 mt-1">Автоматически +${state.autoClickPower}₽ в секунду</div>
+                </div>
+                <div class="glass rounded-lg p-3">
+                    <div class="font-bold text-green-400">💰 Сила клика: ${state.clickPower}₽</div>
+                    <div class="text-xs text-gray-400 mt-1">За каждый клик получаете ${state.clickPower}₽ (x комбо)</div>
+                </div>
+                <div class="glass rounded-lg p-3">
+                    <div class="font-bold text-red-400"> Крит: ${state.critChance}% шанс x${state.critMulti}</div>
+                    <div class="text-xs text-gray-400 mt-1">Шанс получить умноженный клик</div>
+                </div>
+            `;
+
+            // Achievements
+            elAchievementsList.innerHTML = ACHIEVEMENTS.map(a => {
+                const unlocked = state.achievements.has(a.id);
+                return `
+                    <div class="glass rounded-lg p-3 ${unlocked ? '' : 'opacity-50'}">
+                        <div class="font-bold text-sm">${unlocked ? a.name : ' ???'}</div>
+                        <div class="text-xs text-gray-400">${unlocked ? a.desc : 'Не получено'}</div>
+                    </div>
+                `;
+            }).join('');
         }
 
-        function chooseModal(idx) {
-            const choice = window._currentEvent.choices[idx];
-            choice.effect();
-            document.getElementById('event-modal').classList.add('hidden');
-            updateUI();
-        }
-
-        function showEnd(win) {
-            const modal = document.getElementById('end-modal');
-            if (!win) {
-                document.getElementById('end-icon').textContent = '';
-                document.getElementById('end-title').textContent = 'УВОЛЕН!';
-                document.getElementById('end-title').className = 'text-3xl font-bold text-red-400 mb-3';
-                document.getElementById('end-text').textContent = 'Донсков Григорий Владимирович накопил 100 штрафов и уволил завхоза! Алиев Алладина Балдадашевич покидает ГБУ ЯНАО ЦСОН «Гармония»...';
-            }
-            modal.classList.remove('hidden');
-        }
-
-        // Random events
+        // Auto clicker
         setInterval(() => {
-            if (state.gameOver) return;
-            if (Math.random() < 0.1) {
-                const event = EVENTS[Math.floor(Math.random() * EVENTS.length)];
-                showModal(event);
+            if (state.autoClickPower > 0) {
+                state.rubles += state.autoClickPower;
+                checkMissions();
+                checkAchievements();
+                updateUI();
             }
-        }, 20000);
-
-        // Game tick
-        setInterval(() => {
-            if (state.gameOver) return;
-            state.tick++;
-            
-            // New day every 60 ticks
-            if (state.tick % 60 === 0) {
-                state.day++;
-                state.energy = 100;
-                
-                // Pay salaries
-                const totalSalary = state.staff.filter(s => s.hired).reduce((sum, s) => sum + s.salary, 0);
-                state.budget -= totalSalary;
-                logEvent(`📅 Новый день ${state.day}. Зарплаты выплачены: -${totalSalary}₽`, 'yellow');
-                
-                // Generate new tasks
-                if (Math.random() < 0.5) {
-                    const newTask = {
-                        id: `task${Date.now()}`,
-                        title: ['Проверить склад', 'Обойти территорию', 'Составить отчет', 'Принять поставку'][Math.floor(Math.random() * 4)],
-                        desc: 'Новая задача от директора',
-                        reward: Math.floor(Math.random() * 30) + 20,
-                        energy: Math.floor(Math.random() * 10) + 10,
-                        completed: false
-                    };
-                    state.tasks.push(newTask);
-                    logEvent(`📋 Новая задача: ${newTask.title}`, 'blue');
-                }
-            }
-            
-            // Energy recovery
-            if (state.tick % 5 === 0) {
-                state.energy = Math.min(100, state.energy + 2);
-            }
-
-            // Staff work
-            if (state.tick % 10 === 0) {
-                state.staff.filter(s => s.hired).forEach(s => {
-                    if (Math.random() < s.efficiency / 100) {
-                        state.rating += 1;
-                    }
-                });
-            }
-
-            updateUI();
         }, 1000);
 
         // Initial render
         updateUI();
-        logEvent('🎮 Игра началась! Добро пожаловать, завхоз!', 'yellow');
+        logEvent('🎮 Добро пожаловать, завхоз! Кликай чтобы зарабатывать!', 'yellow');
     </script>
 </body>
 </html>
